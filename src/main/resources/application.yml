@@ -1,0 +1,24 @@
+spring:
+  http:
+    converters:
+      preferred-json-mapper: gson
+
+# swagger-ui custom path
+springdoc:
+  swagger-ui.path: /swagger-ui.html
+
+phawtrix:
+  identifier: phawtrix-server
+  brokerHost: phils-home-pi.fritz.box
+  matrixPublishTopic: awtrixmatrix/a
+  matrixSubscribeTopic: matrixClient
+  retryTimes: 5
+
+
+debug: true
+logging:
+  level:
+    ch:
+      phildev: debug
+    com:
+      hivemq: debug
