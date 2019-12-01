@@ -91,18 +91,10 @@ public class MatrixServiceImpl implements MatrixService {
         return command;
     }
 
-    private Mono<byte[]> convertPublishResultsToByteArray(Flux<Mqtt3PublishResult> pubResults) {
-        return pubResults
-                .map(pub -> pub.getPublish().getPayloadAsBytes())
-                .collect(ByteArrayOutputStream::new,
-                        ByteArrayOutputStream::writeBytes)
-                .map(ByteArrayOutputStream::toByteArray);
-    }
-
     private Mono<byte[]> publishScenario(Flux<byte[]> publishPayload) {
         return publishPayload
                 .transformDeferred(publishHandler::publishToMatrix)
-                .transformDeferred(this::convertPublishResultsToByteArray)
+                .transformDeferred(PhawtrixMqttHandler::convertPublishResultsToByteArray)
                 .single();
     }
 }

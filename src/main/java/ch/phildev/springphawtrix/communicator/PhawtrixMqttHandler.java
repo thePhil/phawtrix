@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -63,4 +65,13 @@ public class PhawtrixMqttHandler {
     public @NotNull Mqtt3ReactorClient createInstance() {
         return client;
     }
+
+    public static Mono<byte[]> convertPublishResultsToByteArray(Flux<Mqtt3PublishResult> pubResults) {
+        return pubResults
+                .map(pub -> pub.getPublish().getPayloadAsBytes())
+                .collect(ByteArrayOutputStream::new,
+                        ByteArrayOutputStream::writeBytes)
+                .map(ByteArrayOutputStream::toByteArray);
+    }
+
 }

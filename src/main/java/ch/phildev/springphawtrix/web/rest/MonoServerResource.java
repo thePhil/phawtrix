@@ -1,17 +1,11 @@
 package ch.phildev.springphawtrix.web.rest;
 
 import ch.phildev.springphawtrix.service.MatrixService;
-import ch.phildev.springphawtrix.web.rest.dto.AnswerDto;
-import ch.phildev.springphawtrix.web.rest.dto.BrightnessDto;
-import ch.phildev.springphawtrix.web.rest.dto.ColorDto;
-import ch.phildev.springphawtrix.web.rest.dto.ConsoleCommandDto;
+import ch.phildev.springphawtrix.web.rest.dto.*;
 import com.google.common.io.BaseEncoding;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController

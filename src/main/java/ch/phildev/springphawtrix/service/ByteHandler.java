@@ -15,4 +15,11 @@ public interface ByteHandler {
      * @return the unsigned byte representation
      */
     byte intToByte(int theInt);
+
+    /**
+     * Receive a byte array and turn it into a base16 encoded String (Hex String)
+     *
+     * @return the encoded String
+     */
+    String base16ByteArrayEncode(byte[] byteArray);
 }

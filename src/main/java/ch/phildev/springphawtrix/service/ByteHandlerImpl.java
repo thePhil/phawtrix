@@ -1,5 +1,6 @@
 package ch.phildev.springphawtrix.service;
 
+import com.google.common.io.BaseEncoding;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,5 +18,8 @@ public class ByteHandlerImpl implements ByteHandler {
         return (byte) theInt;
     }
 
-
+    @Override
+    public String base16ByteArrayEncode(byte[] byteArray) {
+        return BaseEncoding.base16().encode(byteArray);
+    }
 }
