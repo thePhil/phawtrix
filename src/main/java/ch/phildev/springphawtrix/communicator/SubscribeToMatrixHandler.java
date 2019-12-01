@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 @Component
@@ -27,18 +28,22 @@ public class SubscribeToMatrixHandler {
     public void goodConnected(Mqtt3ConnAck mqtt3ConnAck) {
         // react on Connection with specific behaviour (logging only)
         // TODO: create a router that decides what todo with the matrix messages
-//        provideMatrixReturnChannel().log().ignoreElements().subscribe();
 
-        log.debug("Now I should subscribe to a channel");
+        log.debug("Now I should subscribe to the matrix channel");
 
-        provideMatrixReturnChannel().log().subscribe();
+        provideMatrixReturnChannel().checkpoint("Subscribed to matrix return channel.")
+                .share()
+                .subscribe();
     }
 
     // TODO: change return type to specific Matrix Messages
     public Flux<Mqtt3Publish> provideMatrixReturnChannel() {
         return client.subscribeStream(subscription)
-                .doOnNext(mqtt5Publish -> mqtt5Publish.getPayload().ifPresent(byteBuffer -> log.debug("Received " +
-                        "Payload: " + StandardCharsets.UTF_8.decode(byteBuffer))))
-                .publish();
+                .doOnNext(this::logPayload)
+                .publishOn(reactor.core.scheduler.Schedulers.parallel());
+    }
+
+    private void logPayload(Mqtt3Publish publish) {
+        log.debug("RECEIVED PAYLOAD: " + StandardCharsets.UTF_8.decode(ByteBuffer.wrap(publish.getPayloadAsBytes())));
     }
 }

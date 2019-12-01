@@ -5,6 +5,7 @@ import ch.phildev.springphawtrix.mqtt3.reactorclient.Mqtt3ReactorClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.ParallelFlux;
 
 @Component
 @Slf4j
