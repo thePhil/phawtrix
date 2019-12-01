@@ -15,8 +15,8 @@ public class CommandEncoderImpl implements CommandEncoder {
 
         byte[] cmdArray = {(byte) command.getByteValue()};
 
-        log.debug("Command length: " + cmdArray.length);
-        log.debug("params length: " + cmdArray.length);
+        log.trace("Command length: " + cmdArray.length);
+        log.trace("params length: " + cmdArray.length);
 
         switch (command) {
             case SHOW:

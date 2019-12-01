@@ -1,5 +1,6 @@
-package ch.phildev.springphawtrix.domain;
+package ch.phildev.springphawtrix.communicator;
 
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 import ch.phildev.springphawtrix.mqtt3.reactorclient.Mqtt3ReactorClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class ConnectToMatrixHandler {
     public Mono<Void> connectScenario() {
 
         if (client.getState().isConnectedOrReconnect()) {
-            log.debug("Returned empty Mono on connect try");
+            log.debug("Returned empty Mono on connect try --> Still connected!");
             return Mono.empty();
         }
 
@@ -37,7 +38,8 @@ public class ConnectToMatrixHandler {
                     subscribeToMatrixHandler.goodConnected(mqtt3ConnAck);
                 })
                 .retry(cfg.getRetryTimes())
-                .doOnError(throwable -> log.error("Could not connect to Broker: " + cfg.getBrokerHost()))
+                .doOnError(throwable -> log.error("Could not connect to Broker: " + cfg.getBrokerHost() + " \n" +
+                        "with error message: " + throwable.getMessage(), throwable))
                 .checkpoint("Connection Scenario")
                 .then();
     }

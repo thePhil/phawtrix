@@ -43,11 +43,10 @@ public class ColorHandlerImpl implements ColorHandler {
 
     @Override
     public byte[] colorToArray(Color c) {
-        log.debug("Decoded Color: " + c.toString());
+        log.trace("Decoded Color: " + c.toString());
 
         byte[] colorArray = new byte[3];
         colorArray[0] = byteHandler.intToByte(c.getRed());
-//                (byte) (c.getRed() / 2);
         colorArray[1] = byteHandler.intToByte(c.getGreen());
         colorArray[2] = byteHandler.intToByte(c.getBlue());
         return colorArray;

@@ -1,4 +1,4 @@
-package ch.phildev.springphawtrix.domain;
+package ch.phildev.springphawtrix.communicator;
 
 import ch.phildev.springphawtrix.mqtt3.reactorclient.Mqtt3ReactorClient;
 import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck;
@@ -30,6 +30,8 @@ public class SubscribeToMatrixHandler {
 //        provideMatrixReturnChannel().log().ignoreElements().subscribe();
 
         log.debug("Now I should subscribe to a channel");
+
+        provideMatrixReturnChannel().log().subscribe();
     }
 
     // TODO: change return type to specific Matrix Messages

@@ -1,5 +1,6 @@
-package ch.phildev.springphawtrix.domain;
+package ch.phildev.springphawtrix.communicator;
 
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 import ch.phildev.springphawtrix.mqtt3.reactorclient.Mqtt3ReactorClient;
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
@@ -31,7 +32,7 @@ public class PhawtrixMqttHandler {
     }
 
     private Mqtt3Client init() {
-        log.error("Initializing the client.");
+        log.trace("Initializing the client");
         //building the client
         return MqttClient.builder()
                 .useMqttVersion3()
@@ -43,11 +44,8 @@ public class PhawtrixMqttHandler {
 
     public Flux<Mqtt3PublishResult> publishToMatrix(Flux<byte[]> payloads) {
         return payloads
-                .checkpoint()
-                .log()
-                .doOnNext(bytes -> log.debug("Now converting"))
                 .map(bytes -> {
-                    log.debug("Create Publish");
+                    log.trace("Create Publish");
                     return Mqtt3Publish.builder()
                             .topic(cfg.getMatrixPublishTopic())
                             .qos(MqttQos.AT_LEAST_ONCE)
@@ -55,8 +53,9 @@ public class PhawtrixMqttHandler {
                             .build();
                 })
                 .publish(client::publish)
-                .doOnSubscribe(subscription -> log.debug("I have been subscribed"))
-                .doOnError(throwable -> log.debug("I tried to connect"))
+                .checkpoint("Just published to the Matrix.")
+                .doOnSubscribe(subscription -> log.trace("Publishing to matrix has been subscribed"))
+                .doOnError(throwable -> log.error("I tried to publish, did not work: ", throwable))
                 .doOnNext(pubResult -> log.debug("Publishing acknowledged: " + new String(pubResult.getPublish().getPayloadAsBytes())));
     }
 

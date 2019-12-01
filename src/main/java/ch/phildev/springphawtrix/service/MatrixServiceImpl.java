@@ -1,8 +1,8 @@
 package ch.phildev.springphawtrix.service;
 
-import ch.phildev.springphawtrix.domain.ConnectToMatrixHandler;
+import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
 import ch.phildev.springphawtrix.domain.PhawtrixCommand;
-import ch.phildev.springphawtrix.domain.PhawtrixMqttHandler;
+import ch.phildev.springphawtrix.communicator.PhawtrixMqttHandler;
 import com.google.common.collect.ImmutableList;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3PublishResult;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +75,7 @@ public class MatrixServiceImpl implements MatrixService {
         List<String> splittedPayloads = ImmutableList.copyOf(trimmedCommand.split(";"));
         PhawtrixCommand cmd = decodeCommand(splittedPayloads);
 
-        return handler.connectScenario()
+        return handler.connectScenario().checkpoint()
                 .then(
                         publishScenario(Flux.just(commandEncoder.getPayloadForMatrix(cmd)))
                 );
@@ -94,7 +94,6 @@ public class MatrixServiceImpl implements MatrixService {
     private Mono<byte[]> convertPublishResultsToByteArray(Flux<Mqtt3PublishResult> pubResults) {
         return pubResults
                 .map(pub -> pub.getPublish().getPayloadAsBytes())
-                .doOnSubscribe(subscription -> log.debug("ConvertToByteCollectArray subscribed"))
                 .collect(ByteArrayOutputStream::new,
                         ByteArrayOutputStream::writeBytes)
                 .map(ByteArrayOutputStream::toByteArray);
