@@ -10,9 +10,9 @@
     </parent>
     <groupId>ch.phildev.</groupId>
     <artifactId>spring-phawtrix</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <name>spring-phawtrix</name>
-    <description>Spring base Phawtrix API</description>
+    <description>Spring based Phawtrix API</description>
 
     <properties>
         <java.version>13</java.version>
