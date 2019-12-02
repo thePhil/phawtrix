@@ -13,6 +13,7 @@ phawtrix:
   matrixPublishTopic: awtrixmatrix/a
   matrixSubscribeTopic: matrixClient
   retryTimes: 5
+  timeoutMs: 1000
 
 
 debug: true

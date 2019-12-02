@@ -1,16 +1,14 @@
 package ch.phildev.springphawtrix.service;
 
 import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
-import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import ch.phildev.springphawtrix.communicator.PhawtrixMqttHandler;
+import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import com.google.common.collect.ImmutableList;
-import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3PublishResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 @Service
@@ -39,7 +37,7 @@ public class MatrixServiceImpl implements MatrixService {
     public Mono<byte[]> setBrightness(int brightness) {
         return handler.connectScenario().checkpoint()
                 .then(
-                        publishScenario(this.getBrightnessPayloadForMatrix(brightness))
+                        publishHandler.publishScenario(this.getBrightnessPayloadForMatrix(brightness))
                 );
     }
 
@@ -57,7 +55,7 @@ public class MatrixServiceImpl implements MatrixService {
 
         return handler.connectScenario().checkpoint()
                 .then(
-                        publishScenario(getColorPayloadForMatrix(colorPayload))
+                        publishHandler.publishScenario(getColorPayloadForMatrix(colorPayload))
                 );
     }
 
@@ -77,7 +75,7 @@ public class MatrixServiceImpl implements MatrixService {
 
         return handler.connectScenario().checkpoint()
                 .then(
-                        publishScenario(Flux.just(commandEncoder.getPayloadForMatrix(cmd)))
+                        publishHandler.publishScenario(Flux.just(commandEncoder.getPayloadForMatrix(cmd)))
                 );
     }
 
@@ -89,12 +87,5 @@ public class MatrixServiceImpl implements MatrixService {
             command = PhawtrixCommand.of(splittedPayloads.get(0));
         }
         return command;
-    }
-
-    private Mono<byte[]> publishScenario(Flux<byte[]> publishPayload) {
-        return publishPayload
-                .transformDeferred(publishHandler::publishToMatrix)
-                .transformDeferred(PhawtrixMqttHandler::convertPublishResultsToByteArray)
-                .single();
     }
 }

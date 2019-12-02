@@ -16,5 +16,6 @@ public class PhawtrixMqttConfig {
     // should be matrixClient
     private String matrixSubscribeTopic;
     private long retryTimes;
+    private long timeoutMs;
 
 }

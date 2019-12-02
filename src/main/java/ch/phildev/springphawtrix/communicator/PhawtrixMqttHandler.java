@@ -44,6 +44,20 @@ public class PhawtrixMqttHandler {
                 .build();
     }
 
+    /**
+     * Publish scenario, that returns the published payload as a byte[]
+     *
+     * @param publishPayload the payload stream to publish
+     *
+     * @return the published byte[]
+     */
+    public Mono<byte[]> publishScenario(Flux<byte[]> publishPayload) {
+        return publishPayload
+                .transformDeferred(this::publishToMatrix)
+                .transformDeferred(PhawtrixMqttHandler::convertPublishResultsToByteArray)
+                .single();
+    }
+
     public Flux<Mqtt3PublishResult> publishToMatrix(Flux<byte[]> payloads) {
         return payloads
                 .map(bytes -> {
@@ -60,6 +74,7 @@ public class PhawtrixMqttHandler {
                 .doOnError(throwable -> log.error("I tried to publish, did not work: ", throwable))
                 .doOnNext(pubResult -> log.debug("Publishing acknowledged: " + new String(pubResult.getPublish().getPayloadAsBytes())));
     }
+
 
     @Bean
     public @NotNull Mqtt3ReactorClient createInstance() {
