@@ -2,7 +2,7 @@ package ch.phildev.springphawtrix.web.rest;
 
 import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
 import ch.phildev.springphawtrix.communicator.MatrixStreamHolder;
-import ch.phildev.springphawtrix.communicator.PhawtrixMqttHandler;
+import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
 import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 import ch.phildev.springphawtrix.service.CommandEncoder;
@@ -32,14 +32,14 @@ public class MatrixInfoResource {
 
     private final PhawtrixMqttConfig cfg;
     private final ConnectToMatrixHandler connectHandler;
-    private final PhawtrixMqttHandler publishHandler;
+    private final PublishToMatrixHandler publishHandler;
     private final MatrixStreamHolder streamHolder;
     private final CommandEncoder commandEncoder;
 
 
     public MatrixInfoResource(PhawtrixMqttConfig cfg,
                               ConnectToMatrixHandler connectHandler,
-                              PhawtrixMqttHandler publishHandler,
+                              PublishToMatrixHandler publishHandler,
                               MatrixStreamHolder streamHolder,
                               CommandEncoder commandEncoder) {
         this.cfg = cfg;

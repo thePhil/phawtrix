@@ -1,7 +1,7 @@
 package ch.phildev.springphawtrix.service;
 
 import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
-import ch.phildev.springphawtrix.communicator.PhawtrixMqttHandler;
+import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
 import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +19,13 @@ public class MatrixServiceImpl implements MatrixService {
     private final ByteHandler byteHandler;
     private final ColorHandler colorHandler;
     private final ConnectToMatrixHandler handler;
-    private final PhawtrixMqttHandler publishHandler;
+    private final PublishToMatrixHandler publishHandler;
 
     public MatrixServiceImpl(CommandEncoder commandEncoder,
                              ByteHandler byteHandler,
                              ColorHandler colorHandler,
                              ConnectToMatrixHandler handler,
-                             PhawtrixMqttHandler publishHandler) {
+                             PublishToMatrixHandler publishHandler) {
         this.commandEncoder = commandEncoder;
         this.byteHandler = byteHandler;
         this.colorHandler = colorHandler;
