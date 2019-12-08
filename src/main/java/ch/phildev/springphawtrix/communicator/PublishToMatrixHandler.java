@@ -40,7 +40,7 @@ public class PublishToMatrixHandler {
                 .single();
     }
 
-    public Flux<Mqtt3PublishResult> publishToMatrix(Flux<byte[]> payloads) {
+    private Flux<Mqtt3PublishResult> publishToMatrix(Flux<byte[]> payloads) {
         return payloads
                 .map(bytes -> {
                     log.trace("Create Publish");
@@ -57,7 +57,7 @@ public class PublishToMatrixHandler {
                 .doOnNext(pubResult -> log.debug("Publishing acknowledged: " + new String(pubResult.getPublish().getPayloadAsBytes())));
     }
 
-    public static Mono<byte[]> convertPublishResultsToByteArray(Flux<Mqtt3PublishResult> pubResults) {
+    private static Mono<byte[]> convertPublishResultsToByteArray(Flux<Mqtt3PublishResult> pubResults) {
         return pubResults
                 .map(pub -> pub.getPublish().getPayloadAsBytes())
                 .collect(ByteArrayOutputStream::new,
