@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import lombok.*;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
