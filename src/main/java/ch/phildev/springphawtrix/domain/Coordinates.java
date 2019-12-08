@@ -1,16 +1,32 @@
 package ch.phildev.springphawtrix.domain;
 
-//@Data
-//@AllArgsConstructor(staticName = "of")
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import lombok.*;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.beans.Transient;
+
+@Builder
+@Value(staticConstructor = "of")
+@RequiredArgsConstructor
+@NonNull
+@JsonDeserialize(builder = Coordinates.CoordinatesBuilder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Coordinates {
 
-    final int x;
-    final int y;
+    @Min(0)
+    @Max(31)
+    private final int x;
 
-    private Coordinates(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+    @Min(0)
+    @Max(7)
+    private final int y;
+
 
     /**
      * Expect coordinates in the string "x,y" as numbers
@@ -25,26 +41,24 @@ public class Coordinates {
             throw new IllegalArgumentException("A coordinate must be expressed as String separated by a ','");
         }
 
-        return Coordinates.of(Integer.parseInt(cords[0]), Integer.parseInt(cords[1]));
+        return Coordinates.builder()
+                .x(Integer.parseInt(cords[0]))
+                .y(Integer.parseInt(cords[1]))
+                .build();
     }
 
-    private static Coordinates of(int x, int y) {
-        return new Coordinates(x, y);
-    }
-
-
+    @Transient
     public byte getByteX() {
-
-        if (x > 255) {
-            throw new IllegalArgumentException("only coordinates up to 255 are supported");
-        }
         return (byte) x;
     }
 
+    @Transient
     public byte getByteY() {
-        if (y > 255) {
-            throw new IllegalArgumentException("only coordinates up to 255 are supported");
-        }
         return (byte) y;
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static final class CoordinatesBuilder {
+
     }
 }

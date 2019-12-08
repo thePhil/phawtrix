@@ -22,24 +22,28 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jdk8</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jsr310</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-module-parameter-names</artifactId>
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                </exclusion>
-            </exclusions>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.fasterxml.jackson.datatype</groupId>-->
+<!--                    <artifactId>jackson-datatype-jdk8</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--                    <artifactId>jackson-databind</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.fasterxml.jackson.datatype</groupId>-->
+<!--                    <artifactId>jackson-datatype-jsr310</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <artifactId>jackson-module-parameter-names</artifactId>-->
+<!--                    <groupId>com.fasterxml.jackson.module</groupId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-starter-json</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -101,9 +105,17 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <excludeGroupIds>com.fasterxml.jackson.core</excludeGroupIds>
-                    <excludeGroupIds>com.fasterxml.jackson.datatype</excludeGroupIds>
-                    <excludeGroupIds>com.fasterxml.jackson.module</excludeGroupIds>
+<!--                    <excludeGroupIds>com.fasterxml.jackson.core</excludeGroupIds>-->
+<!--                    <excludeGroupIds>com.fasterxml.jackson.datatype</excludeGroupIds>-->
+<!--                    <excludeGroupIds>com.fasterxml.jackson.module</excludeGroupIds>-->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>13</source>
+                    <target>13</target>
                 </configuration>
             </plugin>
         </plugins>

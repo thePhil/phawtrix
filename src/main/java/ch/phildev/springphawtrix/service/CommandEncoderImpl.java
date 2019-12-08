@@ -30,6 +30,9 @@ public class CommandEncoderImpl implements CommandEncoder {
                 break;
 
             case DRAW_TEXT:
+                // params: coordinates, color, text
+                payload = Bytes.concat(cmdArray, params[0], params[1], params[2]);
+                break;
             case DRAW_BMP:
             case DRAW_CIRCLE:
             case FILL_CIRCLE:
@@ -39,8 +42,6 @@ public class CommandEncoderImpl implements CommandEncoder {
                 break;
 
             case SET_BRIGHTNESS:
-                payload = Bytes.concat(cmdArray, params[0]);
-                break;
             case FILL_MATRIX:
                 payload = Bytes.concat(cmdArray, params[0]);
                 break;

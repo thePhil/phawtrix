@@ -2,11 +2,14 @@ package ch.phildev.springphawtrix;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Hooks;
 
-@SpringBootApplication
+@SpringBootApplication(
+        exclude = JacksonAutoConfiguration.class
+)
 @Configuration
 //@Import({
 //		AopAutoConfiguration.class,
