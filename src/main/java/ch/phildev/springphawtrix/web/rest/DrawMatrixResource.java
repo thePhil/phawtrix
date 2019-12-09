@@ -3,10 +3,12 @@ package ch.phildev.springphawtrix.web.rest;
 import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
 import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
 import ch.phildev.springphawtrix.domain.PhawtrixCommand;
+import ch.phildev.springphawtrix.service.ByteHandler;
 import ch.phildev.springphawtrix.service.ColorHandler;
 import ch.phildev.springphawtrix.service.CommandEncoder;
 import ch.phildev.springphawtrix.service.CoordinateDecoder;
 import ch.phildev.springphawtrix.web.rest.dto.AnswerDto;
+import ch.phildev.springphawtrix.web.rest.dto.DrawCircleDto;
 import ch.phildev.springphawtrix.web.rest.dto.DrawDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,17 +37,20 @@ public class DrawMatrixResource {
     private final PublishToMatrixHandler publishHandler;
     private final CommandEncoder commandEncoder;
     private final CoordinateDecoder coordinateDecoder;
+    private final ByteHandler byteHandler;
 
     public DrawMatrixResource(ColorHandler colorHandler,
                               ConnectToMatrixHandler connectHandler,
                               PublishToMatrixHandler publishHandler,
                               CommandEncoder commandEncoder,
-                              CoordinateDecoder coordinateDecoder) {
+                              CoordinateDecoder coordinateDecoder,
+                              ByteHandler byteHandler) {
         this.colorHandler = colorHandler;
         this.connectHandler = connectHandler;
         this.publishHandler = publishHandler;
         this.commandEncoder = commandEncoder;
         this.coordinateDecoder = coordinateDecoder;
+        this.byteHandler = byteHandler;
     }
 
     @PostMapping("/text")
@@ -64,8 +69,7 @@ public class DrawMatrixResource {
                     * There is a y offset of 5 added to the specified y-coordinate, which will ensure that specifying (0,0) as coordinates, will display the text in its full height.
 
                     ### Color
-                    The color has to be specified as hex string in it's usual format `#000000` for black."""
-    )
+                    The color has to be specified as hex string in it's usual format `#000000` for black.""")
     @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
                                                      "string.")
     public Mono<AnswerDto> printText(@RequestBody @Valid DrawDto drawDto) {
@@ -83,6 +87,48 @@ public class DrawMatrixResource {
         return connectHandler.connectScenario()
                 .then(
                         publishHandler.publishScenario(cmdPayload)
+                ).map(AnswerUtil::payloadAsHexStringDto);
+    }
+
+    @PostMapping("/circle")
+    @Operation(summary = "Draw a circle to the matrix, filled or empty, with given coordinates in a given color",
+            description = """
+                    This endpoint posts a circle to the matrix.
+
+                    ### Circle Shape
+                    If the circle is supposed to be filled, then you need to specify it explicitly (set field to `true`).
+                    Otherwise it will display an empty circle, with an outline width of 1 pixel.
+
+                    ### Radius
+                    The radius of the circle can be at most 3, if the entire circle should be displayed on the matrix.
+                    Otherwise the circle will be cut of relative to it's positioning.
+
+                    **A radius of 0 will display a single pixel, at the specified coordinates**.
+                    This means that a radius of 2 will add two pixels on each of the four sides of the 1. central pixel.
+
+                    ### Coordinates
+                    The coordinate system root is the top left corner (0x0).
+                    The coordinates specified, mark the always existing center pixel of the circle.
+
+                    ### Color
+                    The color has to be specified as hex string in it's usual format `#000000` for black.""")
+    public Mono<AnswerDto> drawCircle(@RequestBody @Valid DrawCircleDto drawCircleDto) {
+
+        log.debug("Received: " + drawCircleDto);
+
+        var circleCommand = drawCircleDto.isFillCircle() ? PhawtrixCommand.FILL_CIRCLE : PhawtrixCommand.DRAW_CIRCLE;
+
+        var circlePayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+                commandEncoder.getPayloadForMatrix(circleCommand,
+                        coordinateDecoder.getPayloadFromCoordinates(drawCircleDto.getCoordinates()),
+                        byteHandler.intToByteArray(drawCircleDto.getRadius()),
+                        colorHandler.getHexColorAsPayloadArray(drawCircleDto.getHexTextColor())
+                ),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+
+        return connectHandler.connectScenario()
+                .then(
+                        publishHandler.publishScenario(circlePayload)
                 ).map(AnswerUtil::payloadAsHexStringDto);
     }
 }

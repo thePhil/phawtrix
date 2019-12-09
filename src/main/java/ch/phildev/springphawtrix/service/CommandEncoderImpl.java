@@ -31,11 +31,12 @@ public class CommandEncoderImpl implements CommandEncoder {
 
             case DRAW_TEXT:
                 // params: coordinates, color, text
+            case DRAW_CIRCLE:
+            case FILL_CIRCLE:
+                // params: coordinates, radius, color
                 payload = Bytes.concat(cmdArray, params[0], params[1], params[2]);
                 break;
             case DRAW_BMP:
-            case DRAW_CIRCLE:
-            case FILL_CIRCLE:
             case DRAW_PIXEL:
             case DRAW_RECT:
 //                payload = handleCommandWithCoordinates(command, splittedPayloads);
