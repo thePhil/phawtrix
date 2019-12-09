@@ -10,6 +10,7 @@ import ch.phildev.springphawtrix.service.CoordinateDecoder;
 import ch.phildev.springphawtrix.web.rest.dto.AnswerDto;
 import ch.phildev.springphawtrix.web.rest.dto.DrawCircleDto;
 import ch.phildev.springphawtrix.web.rest.dto.DrawDto;
+import ch.phildev.springphawtrix.web.rest.dto.DrawPixelDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -84,10 +85,7 @@ public class DrawMatrixResource {
                 ),
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
 
-        return connectHandler.connectScenario()
-                .then(
-                        publishHandler.publishScenario(cmdPayload)
-                ).map(AnswerUtil::payloadAsHexStringDto);
+        return connectAndPublishAndGetAnswer(cmdPayload);
     }
 
     @PostMapping("/circle")
@@ -112,6 +110,8 @@ public class DrawMatrixResource {
 
                     ### Color
                     The color has to be specified as hex string in it's usual format `#000000` for black.""")
+    @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
+                                                     "string.")
     public Mono<AnswerDto> drawCircle(@RequestBody @Valid DrawCircleDto drawCircleDto) {
 
         log.debug("Received: " + drawCircleDto);
@@ -126,9 +126,38 @@ public class DrawMatrixResource {
                 ),
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
 
+        return connectAndPublishAndGetAnswer(circlePayload);
+    }
+
+    @PostMapping("/pixel")
+    @Operation(summary = "Display a single pixel on the matrix at a specified location in a given color",
+            description = """
+                    This endpoint posts a single pixel to the matrix
+
+                    ### Coordinates
+                    The coordinate system root is the top left corner (0x0).
+                    The coordinates specified, mark the location of the pixel.
+
+                    ### Color
+                    The color has to be specified as hex string in it's usual format `#000000` for black. """)
+    @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
+                                                     "string.")
+    public Mono<AnswerDto> drawPixel(@RequestBody @Valid DrawPixelDto drawPixelDto) {
+        log.debug("Drawing Pixel: " + drawPixelDto);
+
+        var pixelPayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_PIXEL,
+                        coordinateDecoder.getPayloadFromCoordinates(drawPixelDto.getCoordinates()),
+                        colorHandler.getHexColorAsPayloadArray(drawPixelDto.getHexTextColor())),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+
+        return connectAndPublishAndGetAnswer(pixelPayload);
+    }
+
+    private Mono<AnswerDto> connectAndPublishAndGetAnswer(Flux<byte[]> matrixPayload) {
         return connectHandler.connectScenario()
                 .then(
-                        publishHandler.publishScenario(circlePayload)
+                        publishHandler.publishScenario(matrixPayload)
                 ).map(AnswerUtil::payloadAsHexStringDto);
     }
 }
