@@ -179,6 +179,8 @@ public class DrawMatrixResource {
 
                     ### Color
                     The color has to be specified as hex string in it's usual format `#000000` for black. """)
+    @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
+                                                     "string.")
     public Mono<AnswerDto> drawRectangle(@RequestBody @Valid DrawRectangleDto rectangleDto) {
         log.debug("Drawing rectangle: " + rectangleDto);
 
@@ -193,6 +195,35 @@ public class DrawMatrixResource {
 
         return connectAndPublishAndGetAnswer(rectanglePayload);
     }
+
+    @PostMapping(value = "/line")
+    @Operation(summary = "Draws a line in a given color between two defined coordinates",
+            description = """
+                    This endpoint posts a line to the matrix.
+
+                    ### Coordinates
+                    The coordinate system root is the top left corner (0x0).
+
+                    * The first coordinate marks the start point of the line
+                    * The second coordinate marks the end point of the line
+
+                    ### Color
+                    The color has to be specified as hex string in it's usual format `#000000` for black. """)
+    @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
+                                                     "string.")
+    public Mono<AnswerDto> drawLine(@RequestBody @Valid DrawLineDto lineDto) {
+        log.debug("Drawing line: " + lineDto);
+
+        var linePayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_LINE,
+                        coordinateDecoder.getPayloadFromCoordinates(lineDto.getCoordinates1()),
+                        coordinateDecoder.getPayloadFromCoordinates(lineDto.getCoordinates2()),
+                        colorHandler.getHexColorAsPayloadArray(lineDto.getHexTextColor())),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+
+        return connectAndPublishAndGetAnswer(linePayload);
+    }
+
 
     private Mono<AnswerDto> connectAndPublishAndGetAnswer(Flux<byte[]> matrixPayload) {
         return connectHandler.connectScenario()

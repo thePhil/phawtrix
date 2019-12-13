@@ -34,6 +34,8 @@ public class CommandEncoderImpl implements CommandEncoder {
             case DRAW_CIRCLE:
             case FILL_CIRCLE:
                 // params: coordinates, radius, color
+            case DRAW_LINE:
+                // params: coordinates1, coordinates2, color
                 payload = Bytes.concat(cmdArray, params[0], params[1], params[2]);
                 break;
             case DRAW_BMP:
@@ -47,13 +49,6 @@ public class CommandEncoderImpl implements CommandEncoder {
             case SET_BRIGHTNESS:
             case FILL_MATRIX:
                 payload = Bytes.concat(cmdArray, params[0]);
-                break;
-            case DRAW_LINE:
-//                payload = Bytes.concat(cmdArray,
-//                        getCoordinatesArray(splittedPayloads.get(1)),
-//                        getCoordinatesArray(splittedPayloads.get(2)),
-//                        getColorAsArray(splittedPayloads.get(3)));
-
                 break;
             default:
                 throw new IllegalStateException("Command not implemented: " + command);
