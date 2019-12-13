@@ -38,10 +38,10 @@ public class CommandEncoderImpl implements CommandEncoder {
                 break;
             case DRAW_BMP:
             case DRAW_PIXEL:
-                payload = Bytes.concat(cmdArray,params[0],params[1]);
+                payload = Bytes.concat(cmdArray, params[0], params[1]);
                 break;
             case DRAW_RECT:
-//                payload = handleCommandWithCoordinates(command, splittedPayloads);
+                payload = Bytes.concat(cmdArray, params[0], params[1], params[2], params[3]);
                 break;
 
             case SET_BRIGHTNESS:

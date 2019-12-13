@@ -7,10 +7,7 @@ import ch.phildev.springphawtrix.service.ByteHandler;
 import ch.phildev.springphawtrix.service.ColorHandler;
 import ch.phildev.springphawtrix.service.CommandEncoder;
 import ch.phildev.springphawtrix.service.CoordinateDecoder;
-import ch.phildev.springphawtrix.web.rest.dto.AnswerDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawCircleDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawPixelDto;
+import ch.phildev.springphawtrix.web.rest.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -73,15 +70,15 @@ public class DrawMatrixResource {
                     The color has to be specified as hex string in it's usual format `#000000` for black.""")
     @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
                                                      "string.")
-    public Mono<AnswerDto> printText(@RequestBody @Valid DrawDto drawDto) {
-        log.debug("Received: " + drawDto);
+    public Mono<AnswerDto> printText(@RequestBody @Valid DrawTextDto drawTextDto) {
+        log.debug("Received: " + drawTextDto);
 
         Flux<byte[]> cmdPayload = Flux.just(
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_TEXT,
-                        coordinateDecoder.getPayloadFromCoordinates(drawDto.getCoordinates()),
-                        colorHandler.getHexColorAsPayloadArray(drawDto.getHexTextColor()),
-                        drawDto.getText().trim().getBytes(StandardCharsets.UTF_8)
+                        coordinateDecoder.getPayloadFromCoordinates(drawTextDto.getCoordinates()),
+                        colorHandler.getHexColorAsPayloadArray(drawTextDto.getHexTextColor()),
+                        drawTextDto.getText().trim().getBytes(StandardCharsets.UTF_8)
                 ),
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
 
@@ -152,6 +149,49 @@ public class DrawMatrixResource {
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
 
         return connectAndPublishAndGetAnswer(pixelPayload);
+    }
+
+    @PostMapping("/rect")
+    @Operation(summary = "Display a rectangle width x height at a specified location in a given color",
+            description = """
+                    This endpoint posts a rectangle to the matrix.
+
+                    This Example will draw a rectangle along the outer rim of the matrix in orange:
+                    ```json
+                    {
+                      "coordinates": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "width": 32,
+                      "height": 8,
+                      "hexTextColor": "#ffa500"
+                    }
+                    ```
+
+                    ### Coordinates
+                    The coordinate system root is the top left corner (0x0).
+                    The coordinates specified, mark the location of the corner pixel.
+
+                    ### Metrics
+                    * The width is specified as number of pixels width (Sideways to the right from the root pixel corner)
+                    * The height is speicifed as number of pixels height (downwards from the root pixel corner)
+
+                    ### Color
+                    The color has to be specified as hex string in it's usual format `#000000` for black. """)
+    public Mono<AnswerDto> drawRectangle(@RequestBody @Valid DrawRectangleDto rectangleDto) {
+        log.debug("Drawing rectangle: " + rectangleDto);
+
+        var rectanglePayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_RECT,
+                        coordinateDecoder.getPayloadFromCoordinates(rectangleDto.getCoordinates()),
+                        byteHandler.intToByteArray(rectangleDto.getWidth()),
+                        byteHandler.intToByteArray(rectangleDto.getHeight()),
+                        colorHandler.getHexColorAsPayloadArray(rectangleDto.getHexTextColor())
+                ),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+
+        return connectAndPublishAndGetAnswer(rectanglePayload);
     }
 
     private Mono<AnswerDto> connectAndPublishAndGetAnswer(Flux<byte[]> matrixPayload) {

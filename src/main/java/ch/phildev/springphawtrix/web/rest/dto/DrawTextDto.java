@@ -14,10 +14,10 @@ import lombok.Value;
 @Builder
 @RequiredArgsConstructor
 @NonNull
-@JsonDeserialize(builder = DrawDto.DrawDtoBuilder.class)
+@JsonDeserialize(builder = DrawTextDto.DrawDtoBuilder.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DrawDto {
+public class DrawTextDto {
 
     private final Coordinates coordinates;
     private final String text;
