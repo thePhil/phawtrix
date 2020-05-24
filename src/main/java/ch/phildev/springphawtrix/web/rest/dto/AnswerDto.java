@@ -1,9 +1,13 @@
 package ch.phildev.springphawtrix.web.rest.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Builder;
 import lombok.NonNull;
+import lombok.Value;
 
-@Data(staticConstructor = "of")
+@Value
+@Builder
+@JsonDeserialize(builder = AnswerDto.AnswerDtoBuilder.class)
 public class AnswerDto {
     @NonNull
     private String payLoadToMatrix;

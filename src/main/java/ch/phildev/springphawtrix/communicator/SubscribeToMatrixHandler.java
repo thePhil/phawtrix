@@ -1,16 +1,16 @@
 package ch.phildev.springphawtrix.communicator;
 
-import ch.phildev.springphawtrix.mqtt3.reactorclient.Mqtt3ReactorClient;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+
 import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.Mqtt3Subscribe;
+import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
-
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
@@ -47,7 +47,7 @@ public class SubscribeToMatrixHandler {
 
     // TODO: change return type to specific Matrix Messages
     public Flux<Mqtt3Publish> provideMatrixReturnChannel() {
-        return client.subscribeStream(subscription)
+        return client.subscribePublishes(subscription)
                 .doOnNext(this::logPayload)
                 .publishOn(Schedulers.single());
     }

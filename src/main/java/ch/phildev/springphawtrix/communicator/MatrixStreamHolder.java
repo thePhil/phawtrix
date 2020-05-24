@@ -1,12 +1,12 @@
 package ch.phildev.springphawtrix.communicator;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Thread safe holder of {@link Flux} emitting the messages received from the matrix

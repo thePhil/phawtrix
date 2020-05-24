@@ -1,6 +1,5 @@
 package ch.phildev.springphawtrix.web.rest.dto;
 
-import ch.phildev.springphawtrix.domain.Coordinates;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -9,6 +8,8 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+
+import ch.phildev.springphawtrix.domain.Coordinates;
 
 @Value(staticConstructor = "of")
 @Builder

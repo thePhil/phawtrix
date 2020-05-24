@@ -1,13 +1,9 @@
 package ch.phildev.springphawtrix.web.rest;
 
-import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
-import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
-import ch.phildev.springphawtrix.domain.PhawtrixCommand;
-import ch.phildev.springphawtrix.service.ByteHandler;
-import ch.phildev.springphawtrix.service.ColorHandler;
-import ch.phildev.springphawtrix.service.CommandEncoder;
-import ch.phildev.springphawtrix.service.CoordinateDecoder;
-import ch.phildev.springphawtrix.web.rest.dto.*;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
-import java.nio.charset.StandardCharsets;
+import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
+import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
+import ch.phildev.springphawtrix.domain.PhawtrixCommand;
+import ch.phildev.springphawtrix.service.BmpHandler;
+import ch.phildev.springphawtrix.service.ByteHandler;
+import ch.phildev.springphawtrix.service.ColorHandler;
+import ch.phildev.springphawtrix.service.CommandEncoder;
+import ch.phildev.springphawtrix.service.CoordinateDecoder;
+import ch.phildev.springphawtrix.web.rest.dto.AnswerDto;
+import ch.phildev.springphawtrix.web.rest.dto.DrawBmpDto;
+import ch.phildev.springphawtrix.web.rest.dto.DrawCircleDto;
+import ch.phildev.springphawtrix.web.rest.dto.DrawLineDto;
+import ch.phildev.springphawtrix.web.rest.dto.DrawPixelDto;
+import ch.phildev.springphawtrix.web.rest.dto.DrawRectangleDto;
+import ch.phildev.springphawtrix.web.rest.dto.DrawTextDto;
 
 @RestController
 @Slf4j
@@ -36,22 +45,24 @@ public class DrawMatrixResource {
     private final CommandEncoder commandEncoder;
     private final CoordinateDecoder coordinateDecoder;
     private final ByteHandler byteHandler;
+    private final BmpHandler bmpHandler;
 
     public DrawMatrixResource(ColorHandler colorHandler,
                               ConnectToMatrixHandler connectHandler,
                               PublishToMatrixHandler publishHandler,
                               CommandEncoder commandEncoder,
                               CoordinateDecoder coordinateDecoder,
-                              ByteHandler byteHandler) {
+                              ByteHandler byteHandler, BmpHandler bmpHandler) {
         this.colorHandler = colorHandler;
         this.connectHandler = connectHandler;
         this.publishHandler = publishHandler;
         this.commandEncoder = commandEncoder;
         this.coordinateDecoder = coordinateDecoder;
         this.byteHandler = byteHandler;
+        this.bmpHandler = bmpHandler;
     }
 
-    @PostMapping("/text")
+    @PostMapping(value = "/text", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Displays the provided text at the provided coordinate in the defined color on the matrix",
             description = """
                     This endpoint pushes a text to the matrix.
@@ -224,11 +235,26 @@ public class DrawMatrixResource {
         return connectAndPublishAndGetAnswer(linePayload);
     }
 
+    public Mono<AnswerDto> drawBmp(@RequestBody @Valid DrawBmpDto bmpDto) throws IOException {
+        log.debug("Drawing a BMP: " + bmpDto);
+
+        var bmpPayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_BMP,
+                        coordinateDecoder.getPayloadFromCoordinates(bmpDto.getCoordinates()),
+                        byteHandler.intToByteArray(bmpDto.getWidth()),
+                        byteHandler.intToByteArray(bmpDto.getHeight()),
+                        bmpHandler.getBmpAsColorMapPayload(bmpDto.getBase64Bitmap())),
+                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+
+        return connectAndPublishAndGetAnswer(bmpPayload);
+    }
+
 
     private Mono<AnswerDto> connectAndPublishAndGetAnswer(Flux<byte[]> matrixPayload) {
         return connectHandler.connectScenario()
-                .then(
-                        publishHandler.publishScenario(matrixPayload)
-                ).map(AnswerUtil::payloadAsHexStringDto);
+                .thenMany(publishHandler.publishScenarioWithString(matrixPayload))
+                .reduce((prev, current) -> prev + "\n" + current)
+                .doOnNext(answer -> log.debug("\n{}", answer))
+                .map(summary -> AnswerDto.builder().payLoadToMatrix(summary).build());
     }
 }

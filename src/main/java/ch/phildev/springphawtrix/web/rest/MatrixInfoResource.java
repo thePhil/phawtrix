@@ -1,12 +1,7 @@
 package ch.phildev.springphawtrix.web.rest;
 
-import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
-import ch.phildev.springphawtrix.communicator.MatrixStreamHolder;
-import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
-import ch.phildev.springphawtrix.domain.PhawtrixCommand;
-import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
-import ch.phildev.springphawtrix.service.CommandEncoder;
-import ch.phildev.springphawtrix.web.rest.dto.MatrixInfoDto;
+import java.time.Duration;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
@@ -22,7 +17,13 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
+import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
+import ch.phildev.springphawtrix.communicator.MatrixStreamHolder;
+import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
+import ch.phildev.springphawtrix.domain.PhawtrixCommand;
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import ch.phildev.springphawtrix.service.CommandEncoder;
+import ch.phildev.springphawtrix.web.rest.dto.MatrixInfoDto;
 
 @RestController
 @RequestMapping(value = "/matrix-info",

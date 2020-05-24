@@ -1,9 +1,10 @@
 package ch.phildev.springphawtrix.service;
 
-import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import com.google.common.primitives.Bytes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 
 @Component
 @Slf4j
@@ -38,11 +39,13 @@ public class CommandEncoderImpl implements CommandEncoder {
                 // params: coordinates1, coordinates2, color
                 payload = Bytes.concat(cmdArray, params[0], params[1], params[2]);
                 break;
-            case DRAW_BMP:
             case DRAW_PIXEL:
                 payload = Bytes.concat(cmdArray, params[0], params[1]);
                 break;
+            case DRAW_BMP:
+                // params: coordinates, width, height, bmp
             case DRAW_RECT:
+                // params: coordinates, width, height, color
                 payload = Bytes.concat(cmdArray, params[0], params[1], params[2], params[3]);
                 break;
 

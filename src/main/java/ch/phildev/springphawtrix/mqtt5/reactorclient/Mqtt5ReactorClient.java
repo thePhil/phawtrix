@@ -1,5 +1,7 @@
 package ch.phildev.springphawtrix.mqtt5.reactorclient;
 
+import javax.validation.constraints.NotNull;
+
 import com.hivemq.client.internal.mqtt.message.connect.MqttConnect;
 import com.hivemq.client.internal.mqtt.message.connect.MqttConnectBuilder;
 import com.hivemq.client.internal.mqtt.message.disconnect.MqttDisconnect;
@@ -24,8 +26,6 @@ import com.hivemq.client.mqtt.mqtt5.message.unsubscribe.unsuback.Mqtt5UnsubAck;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import javax.validation.constraints.NotNull;
 
 public interface Mqtt5ReactorClient extends Mqtt5Client {
 

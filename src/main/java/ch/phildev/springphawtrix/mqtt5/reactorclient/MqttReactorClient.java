@@ -1,5 +1,7 @@
 package ch.phildev.springphawtrix.mqtt5.reactorclient;
 
+import javax.validation.constraints.NotNull;
+
 import com.hivemq.client.mqtt.MqttGlobalPublishFilter;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5BlockingClient;
@@ -18,8 +20,6 @@ import io.reactivex.Flowable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import javax.validation.constraints.NotNull;
 
 public class MqttReactorClient implements Mqtt5ReactorClient {
 

@@ -1,19 +1,18 @@
 package ch.phildev.springphawtrix.domain;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.beans.Transient;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import java.beans.Transient;
-
-@Builder
+@Builder(toBuilder = true)
 @Value(staticConstructor = "of")
 @RequiredArgsConstructor
 @NonNull
@@ -58,10 +57,5 @@ public class Coordinates {
     @Transient
     public byte getByteY() {
         return (byte) y;
-    }
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static final class CoordinatesBuilder {
-
     }
 }

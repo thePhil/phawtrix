@@ -1,18 +1,21 @@
 package ch.phildev.springphawtrix.communicator;
 
-import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
-import ch.phildev.springphawtrix.mqtt3.reactorclient.Mqtt3ReactorClient;
+import javax.validation.constraints.NotNull;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.stream.IntStream;
+
+import com.google.common.io.BaseEncoding;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3PublishResult;
+import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.NotNull;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 
 @Component
 @Slf4j
@@ -40,6 +43,12 @@ public class PublishToMatrixHandler {
                 .single();
     }
 
+    public Flux<String> publishScenarioWithString(Flux<byte[]> publishPayload){
+        return publishPayload
+                .transformDeferred(this::publishToMatrix)
+                .transformDeferred(PublishToMatrixHandler::convertPublishResultsToReadableString);
+    }
+
     private Flux<Mqtt3PublishResult> publishToMatrix(Flux<byte[]> payloads) {
         return payloads
                 .map(bytes -> {
@@ -65,4 +74,16 @@ public class PublishToMatrixHandler {
                 .map(ByteArrayOutputStream::toByteArray);
     }
 
+
+    private static Flux<String> convertPublishResultsToReadableString(Flux<Mqtt3PublishResult> pubResults) {
+        Flux<Integer> sequenceFlux = Flux.fromStream(IntStream.iterate(0, i -> i + 1).boxed());
+
+        return pubResults
+                .map(pub -> pub.getPublish().getPayloadAsBytes())
+                .zipWith(sequenceFlux,
+                        (bytes, step) -> String.format("Message %06d: %s %s",
+                                step,
+                                BaseEncoding.base16().upperCase().encode(bytes),
+                                new String(bytes)));
+    }
 }

@@ -1,15 +1,16 @@
 package ch.phildev.springphawtrix.service;
 
-import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
-import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
-import ch.phildev.springphawtrix.domain.PhawtrixCommand;
+import java.util.List;
+
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
+import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
+import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 
 @Service
 @Slf4j

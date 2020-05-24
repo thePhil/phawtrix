@@ -1,8 +1,8 @@
 package ch.phildev.springphawtrix.web.rest.dto;
 
-import lombok.Data;
-
 import java.net.InetAddress;
+
+import lombok.Data;
 
 @Data
 public class MatrixInfoDto {

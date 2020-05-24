@@ -1,11 +1,11 @@
 package ch.phildev.springphawtrix.communicator;
 
-import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
-import ch.phildev.springphawtrix.mqtt3.reactorclient.Mqtt3ReactorClient;
+import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ParallelFlux;
+
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 
 @Component
 @Slf4j
@@ -40,7 +40,7 @@ public class ConnectToMatrixHandler {
                 })
                 .retry(cfg.getRetryTimes())
                 .doOnError(throwable -> log.error("Could not connect to Broker: " + cfg.getBrokerHost() + " \n" +
-                        "with error message: " + throwable.getMessage(), throwable))
+                                                  "with error message: " + throwable.getMessage(), throwable))
                 .checkpoint("Connection Scenario")
                 .then();
     }

@@ -1,8 +1,9 @@
 package ch.phildev.springphawtrix.service;
 
-import ch.phildev.springphawtrix.domain.Coordinates;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import ch.phildev.springphawtrix.domain.Coordinates;
 
 @Component
 @Slf4j

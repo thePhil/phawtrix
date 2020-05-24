@@ -1,15 +1,16 @@
 package ch.phildev.springphawtrix.communicator;
 
-import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
-import ch.phildev.springphawtrix.mqtt3.reactorclient.Mqtt3ReactorClient;
+import javax.validation.constraints.NotNull;
+import java.util.UUID;
+
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
+import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 
 @Component
 @Slf4j

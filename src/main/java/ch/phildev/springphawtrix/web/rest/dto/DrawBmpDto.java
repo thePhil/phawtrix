@@ -11,23 +11,25 @@ import lombok.Value;
 
 import ch.phildev.springphawtrix.domain.Coordinates;
 
-@Value
+@Value(staticConstructor = "of")
 @Builder
 @RequiredArgsConstructor
 @NonNull
-@JsonDeserialize(builder = DrawTextDto.DrawTextDtoBuilder.class)
+@JsonDeserialize(builder = DrawBmpDto.DrawBmpDtoBuilder.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DrawTextDto {
+public class DrawBmpDto {
 
-    private final Coordinates coordinates;
-    private final String text;
-    private final String hexTextColor;
+   private final Coordinates coordinates;
+   private final int width;
+   private final int height;
+   // Base64 encoded byte array of colors. Where colors are encoded line by line top to bottom and each line left to
+   // right
+   // Here we expect an bitmap
+   private final String base64Bitmap;
 
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class DrawTextDtoBuilder {
-        Coordinates coordinatesWithBuilder(Coordinates.CoordinatesBuilder coordinatesBuilder) {
-            return coordinatesBuilder.build();
-        }
-    }
+   @JsonPOJOBuilder(withPrefix = "")
+   public static class DrawBmpDtoBuilder{
+
+   }
 }
