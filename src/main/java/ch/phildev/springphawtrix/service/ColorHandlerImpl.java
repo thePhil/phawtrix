@@ -51,4 +51,20 @@ public class ColorHandlerImpl implements ColorHandler {
         colorArray[2] = byteHandler.intToByte(c.getBlue());
         return colorArray;
     }
+
+
+    private char colorTo16Bit(Color c) {
+
+        char r = (char) ((c.getRed() & 0xF8) << 8);
+        char g = (char) ((c.getGreen() & 0xFC) << 3);
+        char b = (char) ((c.getBlue() >> 3));
+
+        return (char) (r | g | b);
+    }
+
+    @Override
+    public byte[] colorTo16BitArray(Color c) {
+        return byteHandler.intToShortByteArray(colorTo16Bit(c));
+    }
+
 }

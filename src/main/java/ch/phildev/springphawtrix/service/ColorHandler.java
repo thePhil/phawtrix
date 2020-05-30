@@ -38,4 +38,12 @@ public interface ColorHandler {
      * @return the corresponding payload
      */
     byte[] colorToArray(Color c);
+
+
+    /**
+     * Convert a given color to a Neomatrix compatible 16 bit representation
+     * @param c
+     * @return
+     */
+    byte[] colorTo16BitArray(Color c);
 }

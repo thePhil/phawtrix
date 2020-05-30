@@ -17,6 +17,14 @@ public interface ByteHandler {
     byte intToByte(int theInt);
 
     /**
+     * Converts an integer of [0;65535} into an unsigned short representation as array of two elements
+     *
+     * @param theInt to convert
+     * @return the unsigned byte array representation
+     */
+    byte[] intToShortByteArray(int theInt);
+
+    /**
      * Receive a byte array and turn it into a base16 encoded String (Hex String)
      *
      * @return the encoded String

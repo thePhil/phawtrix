@@ -53,6 +53,7 @@ public class SubscribeToMatrixHandler {
     }
 
     private void logPayload(Mqtt3Publish publish) {
-        log.debug("RECEIVED PAYLOAD: " + StandardCharsets.UTF_8.decode(ByteBuffer.wrap(publish.getPayloadAsBytes())));
+        log.debug("RECEIVED PAYLOAD of Type({}) on topic {}: {} ", publish.getType(), publish.getTopic(),
+                StandardCharsets.UTF_8.decode(ByteBuffer.wrap(publish.getPayloadAsBytes())));
     }
 }

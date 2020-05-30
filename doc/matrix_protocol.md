@@ -49,3 +49,18 @@ The coordinates, of where the "cursor" is moved to start printing a payload, are
 For each coordinate the formula to get to the actual int value is: `coordinate = int(payload[1] << 8) + int(payload[2])`.
 
 This essentially means that the first payload byte is shifted 8 bit to the left, with zeroes being filled on the right, followed by a conversion to an int. The second payload byte is more clear. Here the raw byte value is converted to an int.
+
+## Command structure
+
+### DrawBmp (0x01)
+
+|byteIndex|content|Description|
+|-|-|-|
+|0|0x01|command|
+|1|coordinate| coordinate x|
+|2|coordinate| coordinate x|
+|3|coordinate| coordinate y|
+|4|coordinate| coordinate y|
+|5|width| width|
+|6|height|height|
+|7 ....| color bytes| color bytes pairwise|

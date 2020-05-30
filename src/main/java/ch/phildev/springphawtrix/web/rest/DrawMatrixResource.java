@@ -1,8 +1,10 @@
 package ch.phildev.springphawtrix.web.rest;
 
 import javax.validation.Valid;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
 import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
+import ch.phildev.springphawtrix.domain.Coordinates;
 import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import ch.phildev.springphawtrix.service.BmpHandler;
 import ch.phildev.springphawtrix.service.ByteHandler;
@@ -235,6 +238,8 @@ public class DrawMatrixResource {
         return connectAndPublishAndGetAnswer(linePayload);
     }
 
+
+    @PostMapping(value = "/bmp")
     public Mono<AnswerDto> drawBmp(@RequestBody @Valid DrawBmpDto bmpDto) throws IOException {
         log.debug("Drawing a BMP: " + bmpDto);
 
@@ -247,6 +252,20 @@ public class DrawMatrixResource {
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
 
         return connectAndPublishAndGetAnswer(bmpPayload);
+    }
+
+    @PostMapping(value = "/rawBmp")
+    public Mono<AnswerDto> drawBmp(@RequestBody @Valid Map<Integer, String> bmpMap) throws IOException {
+        log.debug(bmpMap.toString());
+        String colorBitmap = bmpHandler.colorArrayAsBase64Bitmap(bmpMap.values().stream()
+                .map(Color::decode)
+                .toArray(Color[]::new));
+        DrawBmpDto drawBmpDto = DrawBmpDto.builder().coordinates(Coordinates.builder().x(0).y(0).build())
+                .width(32).height(8)
+                .base64Bitmap(colorBitmap)
+                .build();
+
+        return drawBmp(drawBmpDto);
     }
 
 
