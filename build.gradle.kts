@@ -1,3 +1,4 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
 group = "ch.phildev."
@@ -13,7 +14,7 @@ plugins {
     `maven-publish`
     id("org.springframework.boot") version "2.3.2.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
-
+    id("com.github.ben-manes.versions") version "0.29.0"
 }
 
 java {
@@ -23,7 +24,7 @@ java {
 
 val mqttVersion = "1.2.0"
 val guavaVersion = "29.0-jre"
-val webfluxDocVersion = "1.3.9"
+val webfluxDocVersion = "1.4.3"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -50,17 +51,27 @@ tasks.test {
     jvmArgs("--enable-preview")
     testLogging {
         showExceptions = true
-        showStandardStreams = true
-        events(PASSED,SKIPPED,FAILED)
+//        showStandardStreams = true
+        events(PASSED, SKIPPED, FAILED)
     }
 }
-
 
 tasks.withType<JavaCompile> {
     options.compilerArgs.add("--enable-preview")
 }
-tasks.withType<JavaExec>{
+tasks.withType<JavaExec> {
     jvmArgs("--enable-preview")
 }
 
+tasks.named("dependencyUpdates", DependencyUpdatesTask::class.java).configure {
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+}
 
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
+}
