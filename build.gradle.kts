@@ -25,7 +25,6 @@ java {
 val mqttVersion = "1.2.0"
 val guavaVersion = "29.0-jre"
 val webfluxDocVersion = "1.4.3"
-
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.google.code.gson:gson")
@@ -67,6 +66,10 @@ tasks.named("dependencyUpdates", DependencyUpdatesTask::class.java).configure {
     rejectVersionIf {
         isNonStable(candidate.version)
     }
+}
+
+springBoot{
+    buildInfo()
 }
 
 fun isNonStable(version: String): Boolean {
