@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
-import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
 import ch.phildev.springphawtrix.domain.Coordinates;
 import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import ch.phildev.springphawtrix.service.BmpHandler;
@@ -26,6 +24,7 @@ import ch.phildev.springphawtrix.service.ByteHandler;
 import ch.phildev.springphawtrix.service.ColorHandler;
 import ch.phildev.springphawtrix.service.CommandEncoder;
 import ch.phildev.springphawtrix.service.CoordinateDecoder;
+import ch.phildev.springphawtrix.service.MatrixFrameDeliveryService;
 import ch.phildev.springphawtrix.web.rest.dto.AnswerDto;
 import ch.phildev.springphawtrix.web.rest.dto.DrawBmpDto;
 import ch.phildev.springphawtrix.web.rest.dto.DrawCircleDto;
@@ -43,26 +42,22 @@ public class DrawMatrixResource {
 
 
     private final ColorHandler colorHandler;
-    private final ConnectToMatrixHandler connectHandler;
-    private final PublishToMatrixHandler publishHandler;
     private final CommandEncoder commandEncoder;
     private final CoordinateDecoder coordinateDecoder;
     private final ByteHandler byteHandler;
     private final BmpHandler bmpHandler;
+    private final MatrixFrameDeliveryService frameDeliveryService;
 
     public DrawMatrixResource(ColorHandler colorHandler,
-                              ConnectToMatrixHandler connectHandler,
-                              PublishToMatrixHandler publishHandler,
                               CommandEncoder commandEncoder,
                               CoordinateDecoder coordinateDecoder,
-                              ByteHandler byteHandler, BmpHandler bmpHandler) {
+                              ByteHandler byteHandler, BmpHandler bmpHandler, MatrixFrameDeliveryService frameDeliveryService) {
         this.colorHandler = colorHandler;
-        this.connectHandler = connectHandler;
-        this.publishHandler = publishHandler;
         this.commandEncoder = commandEncoder;
         this.coordinateDecoder = coordinateDecoder;
         this.byteHandler = byteHandler;
         this.bmpHandler = bmpHandler;
+        this.frameDeliveryService = frameDeliveryService;
     }
 
     @PostMapping(value = "/text", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -87,16 +82,13 @@ public class DrawMatrixResource {
     public Mono<AnswerDto> printText(@RequestBody @Valid DrawTextDto drawTextDto) {
         log.debug("Received: " + drawTextDto);
 
-        Flux<byte[]> cmdPayload = Flux.just(
-                commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
-                commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_TEXT,
-                        coordinateDecoder.getPayloadFromCoordinates(drawTextDto.getCoordinates()),
-                        colorHandler.getHexColorAsPayloadArray(drawTextDto.getHexTextColor()),
-                        drawTextDto.getText().trim().getBytes(StandardCharsets.UTF_8)
-                ),
-                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
-
-        return connectAndPublishAndGetAnswer(cmdPayload);
+        return frameDeliveryService.publishFrameToMatrix(
+                Flux.just(
+                        commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_TEXT,
+                                coordinateDecoder.getPayloadFromCoordinates(drawTextDto.getCoordinates()),
+                                colorHandler.getHexColorAsPayloadArray(drawTextDto.getHexTextColor()),
+                                drawTextDto.getText().trim().getBytes(StandardCharsets.UTF_8)
+                        )));
     }
 
     @PostMapping("/circle")
@@ -129,15 +121,11 @@ public class DrawMatrixResource {
 
         var circleCommand = drawCircleDto.isFillCircle() ? PhawtrixCommand.FILL_CIRCLE : PhawtrixCommand.DRAW_CIRCLE;
 
-        var circlePayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
-                commandEncoder.getPayloadForMatrix(circleCommand,
-                        coordinateDecoder.getPayloadFromCoordinates(drawCircleDto.getCoordinates()),
-                        byteHandler.intToByteArray(drawCircleDto.getRadius()),
-                        colorHandler.getHexColorAsPayloadArray(drawCircleDto.getHexTextColor())
-                ),
-                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
-
-        return connectAndPublishAndGetAnswer(circlePayload);
+        return frameDeliveryService.publishFrameToMatrix(Flux.just(
+                commandEncoder.getPayloadForMatrix(circleCommand, coordinateDecoder.getPayloadFromCoordinates(drawCircleDto.getCoordinates())),
+                byteHandler.intToByteArray(drawCircleDto.getRadius()),
+                colorHandler.getHexColorAsPayloadArray(drawCircleDto.getHexTextColor()))
+        );
     }
 
     @PostMapping("/pixel")
@@ -156,13 +144,12 @@ public class DrawMatrixResource {
     public Mono<AnswerDto> drawPixel(@RequestBody @Valid DrawPixelDto drawPixelDto) {
         log.debug("Drawing Pixel: " + drawPixelDto);
 
-        var pixelPayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+        var pixelPayload = Flux.just(
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_PIXEL,
                         coordinateDecoder.getPayloadFromCoordinates(drawPixelDto.getCoordinates()),
-                        colorHandler.getHexColorAsPayloadArray(drawPixelDto.getHexTextColor())),
-                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+                        colorHandler.getHexColorAsPayloadArray(drawPixelDto.getHexTextColor())));
 
-        return connectAndPublishAndGetAnswer(pixelPayload);
+        return frameDeliveryService.publishFrameToMatrix(pixelPayload);
     }
 
     @PostMapping("/rect")
@@ -198,16 +185,15 @@ public class DrawMatrixResource {
     public Mono<AnswerDto> drawRectangle(@RequestBody @Valid DrawRectangleDto rectangleDto) {
         log.debug("Drawing rectangle: " + rectangleDto);
 
-        var rectanglePayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+        var rectanglePayload = Flux.just(
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_RECT,
                         coordinateDecoder.getPayloadFromCoordinates(rectangleDto.getCoordinates()),
                         byteHandler.intToByteArray(rectangleDto.getWidth()),
                         byteHandler.intToByteArray(rectangleDto.getHeight()),
                         colorHandler.getHexColorAsPayloadArray(rectangleDto.getHexTextColor())
-                ),
-                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+                ));
 
-        return connectAndPublishAndGetAnswer(rectanglePayload);
+        return frameDeliveryService.publishFrameToMatrix(rectanglePayload);
     }
 
     @PostMapping(value = "/line")
@@ -228,14 +214,13 @@ public class DrawMatrixResource {
     public Mono<AnswerDto> drawLine(@RequestBody @Valid DrawLineDto lineDto) {
         log.debug("Drawing line: " + lineDto);
 
-        var linePayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+        var linePayload = Flux.just(
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_LINE,
                         coordinateDecoder.getPayloadFromCoordinates(lineDto.getCoordinates1()),
                         coordinateDecoder.getPayloadFromCoordinates(lineDto.getCoordinates2()),
-                        colorHandler.getHexColorAsPayloadArray(lineDto.getHexTextColor())),
-                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+                        colorHandler.getHexColorAsPayloadArray(lineDto.getHexTextColor())));
 
-        return connectAndPublishAndGetAnswer(linePayload);
+        return frameDeliveryService.publishFrameToMatrix(linePayload);
     }
 
 
@@ -243,15 +228,14 @@ public class DrawMatrixResource {
     public Mono<AnswerDto> drawBmp(@RequestBody @Valid DrawBmpDto bmpDto) throws IOException {
         log.debug("Drawing a BMP: " + bmpDto);
 
-        var bmpPayload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.CLEAR),
+        var bmpPayload = Flux.just(
                 commandEncoder.getPayloadForMatrix(PhawtrixCommand.DRAW_BMP,
                         coordinateDecoder.getPayloadFromCoordinates(bmpDto.getCoordinates()),
                         byteHandler.intToByteArray(bmpDto.getWidth()),
                         byteHandler.intToByteArray(bmpDto.getHeight()),
-                        bmpHandler.getBmpAsColorMapPayload(bmpDto.getBase64Bitmap())),
-                commandEncoder.getPayloadForMatrix(PhawtrixCommand.SHOW));
+                        bmpHandler.getBmpAsColorMapPayload(bmpDto.getBase64Bitmap())));
 
-        return connectAndPublishAndGetAnswer(bmpPayload);
+        return frameDeliveryService.publishFrameToMatrix(bmpPayload);
     }
 
     @PostMapping(value = "/rawBmp")
@@ -266,14 +250,5 @@ public class DrawMatrixResource {
                 .build();
 
         return drawBmp(drawBmpDto);
-    }
-
-
-    private Mono<AnswerDto> connectAndPublishAndGetAnswer(Flux<byte[]> matrixPayload) {
-        return connectHandler.connectScenario()
-                .thenMany(publishHandler.publishScenarioWithString(matrixPayload))
-                .reduce((prev, current) -> prev + "\n" + current)
-                .doOnNext(answer -> log.debug("\n{}", answer))
-                .map(summary -> AnswerDto.builder().payLoadToMatrix(summary).build());
     }
 }

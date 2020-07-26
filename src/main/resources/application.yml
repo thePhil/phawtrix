@@ -1,3 +1,7 @@
+spring:
+  main:
+    lazy-initialization: true
+
 # swagger-ui custom path
 springdoc:
   swagger-ui.path: /swagger-ui.html

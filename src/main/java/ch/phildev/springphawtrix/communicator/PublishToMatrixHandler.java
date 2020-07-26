@@ -43,7 +43,7 @@ public class PublishToMatrixHandler {
                 .single();
     }
 
-    public Flux<String> publishScenarioWithString(Flux<byte[]> publishPayload){
+    public Flux<String> publishScenarioWithString(Flux<byte[]> publishPayload) {
         return publishPayload
                 .transformDeferred(this::publishToMatrix)
                 .transformDeferred(PublishToMatrixHandler::convertPublishResultsToReadableString);
@@ -83,7 +83,7 @@ public class PublishToMatrixHandler {
                 .zipWith(sequenceFlux,
                         (bytes, step) -> String.format("Message %06d: %s %s",
                                 step,
-                                BaseEncoding.base16().upperCase().encode(bytes),
+                                BaseEncoding.base16().upperCase().withSeparator(" ", 2).encode(bytes),
                                 new String(bytes)));
     }
 }

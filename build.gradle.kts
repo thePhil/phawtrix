@@ -35,7 +35,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    runtimeOnly("org.springframework.boot:spring-boot-devtools")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.assertj:assertj-core")
@@ -50,7 +50,7 @@ tasks.test {
     jvmArgs("--enable-preview")
     testLogging {
         showExceptions = true
-//        showStandardStreams = true
+        showStandardStreams = true
         events(PASSED, SKIPPED, FAILED)
     }
 }
@@ -68,7 +68,7 @@ tasks.named("dependencyUpdates", DependencyUpdatesTask::class.java).configure {
     }
 }
 
-springBoot{
+springBoot {
     buildInfo()
 }
 
