@@ -25,13 +25,21 @@ java {
 val mqttVersion = "1.2.0"
 val guavaVersion = "29.0-jre"
 val webfluxDocVersion = "1.4.3"
+val jetBrainsAnnotationVersion = "19.0.0"
 dependencies {
+    val springBootGroup = "org.springframework.boot"
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-oauth2-core")
+
+    implementation("org.springframework.security:spring-security-oauth2-client")
     implementation("com.google.code.gson:gson")
     implementation("org.springdoc", "springdoc-openapi-webflux-ui", webfluxDocVersion)
     implementation("com.hivemq", "hivemq-mqtt-client", mqttVersion)
     implementation("com.hivemq", "hivemq-mqtt-client-reactor", mqttVersion)
     implementation("com.google.guava", "guava", guavaVersion)
+    implementation("org.jetbrains", "annotations", jetBrainsAnnotationVersion)
+
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

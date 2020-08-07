@@ -19,21 +19,6 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @Override
     public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-
-//        objectMapper.setAnnotationIntrospector(
-//                new JacksonAnnotationIntrospector() {
-//                    @Override
-//                    public JsonPOJOBuilder.Value findPOJOBuilderConfig(AnnotatedClass ac) {
-//                        if (ac.hasAnnotation(JsonPOJOBuilder.class)) {
-//                            return super.findPOJOBuilderConfig(ac);
-//                        }
-//
-//                        return new JsonPOJOBuilder.Value("build", "");
-//                    }
-//                });
-//        configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper));
-//        configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper));
-
     }
 
     @Override
