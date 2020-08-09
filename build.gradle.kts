@@ -11,6 +11,7 @@ repositories {
 
 plugins {
     java
+    idea
     `maven-publish`
     id("org.springframework.boot") version "2.3.2.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
@@ -20,6 +21,12 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
+}
+idea {
+    module {
+        isDownloadJavadoc = false
+        isDownloadSources = true
+    }
 }
 
 val mqttVersion = "1.2.0"

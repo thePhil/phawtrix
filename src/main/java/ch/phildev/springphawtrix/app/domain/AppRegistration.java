@@ -1,4 +1,4 @@
-package ch.phildev.springphawtrix.app.management;
+package ch.phildev.springphawtrix.app.domain;
 
 import java.util.Map;
 

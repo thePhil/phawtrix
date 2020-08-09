@@ -1,17 +1,38 @@
 package ch.phildev.springphawtrix.app.management;
 
+import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
+import ch.phildev.springphawtrix.service.MatrixFrameDeliveryService;
+import reactor.core.publisher.Flux;
+
 /**
- * This manager is responsible for the lifecycle management of {@link PhawtrixApp(s)}
- *
+ * This manager is responsible for the lifecycle management of a {@link PhawtrixApp}
+ * <p>
  * The primary lifecycle include to following stages:
  *
  * <ol>
- *     <li>Initializing the app for usage</li>
- *     <li>Executing the app</li>
+ *     <li>Initializing the app for usage <br>
+ *         Done via {@link PhawtrixApp#init()}</li>
+ *     <li>Persistance of the initialized app in {@link AppRepository} by delegating to the
+ *     {@link ReactivePhawtrixAppRepositoryService}</li>
+ *     <li>Executing the app
+ *          <ul><li>Load from {@link AppRepository} with {@link ReactivePhawtrixAppRepositoryService}</li>
+ *          <li>Stick into {@link PhawtrixCurrentAppHolder}</li>
+ *          <li>Executing by using {@link PhawtrixApp#execute()}</li></ul>
+ *     </li>
  *     <li>Shutting down the app</li>
  * </ol>
- *
+ * <p>
+ * The manager uses a {@link ReactivePhawtrixAppRepositoryService} to retrieve apps from the repository and manages
+ * the currently running app in an instance of a {@link PhawtrixCurrentAppHolder}.
+ * <p>
  * The app is a publisher of frames that will be displayed using
+ * {@link MatrixFrameDeliveryService#publishFrameToMatrix(Flux)}
  */
 public interface PhawtrixAppManager {
+
+    /**
+     * Execute the named app
+     * @param appName the name of the app to execute
+     */
+    void execute(String appName);
 }

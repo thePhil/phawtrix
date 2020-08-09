@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.Assert;
