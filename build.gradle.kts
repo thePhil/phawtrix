@@ -12,22 +12,21 @@ repositories {
 plugins {
     java
     `maven-publish`
-    id("org.springframework.boot") version "2.3.2.RELEASE"
-    id("io.spring.dependency-management") version "1.0.9.RELEASE"
-    id("com.github.ben-manes.versions") version "0.29.0"
+    id("org.springframework.boot") version "2.3.4.RELEASE"
+    id("io.spring.dependency-management") version "1.0.10.RELEASE"
+    id("com.github.ben-manes.versions") version "0.33.0"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_14
-    targetCompatibility = JavaVersion.VERSION_14
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
 }
 
-val mqttVersion = "1.2.0"
+val mqttVersion = "1.2.1"
 val guavaVersion = "29.0-jre"
-val webfluxDocVersion = "1.4.3"
-val jetBrainsAnnotationVersion = "19.0.0"
+val webfluxDocVersion = "1.4.6"
+val jetBrainsAnnotationVersion = "20.1.0"
 dependencies {
-    val springBootGroup = "org.springframework.boot"
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-oauth2-core")
@@ -55,7 +54,7 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-    jvmArgs("--enable-preview")
+//    jvmArgs("--enable-preview")
     testLogging {
         showExceptions = true
         showStandardStreams = true
@@ -63,12 +62,12 @@ tasks.test {
     }
 }
 
-tasks.withType<JavaCompile> {
-    options.compilerArgs.add("--enable-preview")
-}
-tasks.withType<JavaExec> {
-    jvmArgs("--enable-preview")
-}
+//tasks.withType<JavaCompile> {
+//    options.compilerArgs.add("--enable-preview")
+//}
+//tasks.withType<JavaExec> {
+//    jvmArgs("--enable-preview")
+//}
 
 tasks.named("dependencyUpdates", DependencyUpdatesTask::class.java).configure {
     rejectVersionIf {

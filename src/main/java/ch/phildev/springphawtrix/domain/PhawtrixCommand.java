@@ -30,7 +30,7 @@ public enum PhawtrixCommand {
         }
     }
 
-    private byte byteValue;
+    private final byte byteValue;
 
     PhawtrixCommand(byte byteValue) {
         this.byteValue = byteValue;

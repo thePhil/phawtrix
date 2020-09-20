@@ -22,12 +22,10 @@ import lombok.Value;
 public class Coordinates {
 
     @Min(0)
-    @Max(31)
-    private final int x;
+    @Max(31) int x;
 
     @Min(0)
-    @Max(7)
-    private final int y;
+    @Max(7) int y;
 
 
     /**
