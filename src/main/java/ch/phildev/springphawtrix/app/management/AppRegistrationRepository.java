@@ -2,10 +2,10 @@ package ch.phildev.springphawtrix.app.management;
 
 import reactor.core.publisher.Mono;
 
-public interface AppRepository {
+public interface AppRegistrationRepository {
 
     /**
-     * Find an App by it appName
+     * Find an App Registration by it appName
      *
      * @param appName the name of the application
      *

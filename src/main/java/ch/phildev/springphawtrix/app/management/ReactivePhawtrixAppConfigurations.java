@@ -12,11 +12,11 @@ public class ReactivePhawtrixAppConfigurations {
     static class ReactiveAppRegistrationRepositoryConfiguration {
 
         @Bean
-        DefaultInMemoryAppRepository appRegistrationRepository(PhawtrixAppProperties properties) {
+        DefaultInMemoryAppRegistrationRepository appRegistrationRepository(PhawtrixAppProperties properties) {
             List<AppRegistration> registrations =
                     new ArrayList<>(PhawtrixAppPropertiesAppRegistrationAdapter.getAppRegistrations(properties).values());
 
-            return new DefaultInMemoryAppRepository(registrations);
+            return new DefaultInMemoryAppRegistrationRepository(registrations);
         }
     }
 }

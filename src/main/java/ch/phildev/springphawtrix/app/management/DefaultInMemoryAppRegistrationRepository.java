@@ -11,11 +11,11 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 
 @Getter
-public class DefaultInMemoryAppRepository implements AppRepository , Iterable<AppRegistration>{
+public class DefaultInMemoryAppRegistrationRepository implements AppRegistrationRepository, Iterable<AppRegistration>{
 
     private final Map<String,AppRegistration> appRegistrations;
 
-    public DefaultInMemoryAppRepository(List<AppRegistration> appRegistrations) {
+    public DefaultInMemoryAppRegistrationRepository(List<AppRegistration> appRegistrations) {
         this.appRegistrations = toUnmodifiableConcurrentMap(appRegistrations);
     }
 
