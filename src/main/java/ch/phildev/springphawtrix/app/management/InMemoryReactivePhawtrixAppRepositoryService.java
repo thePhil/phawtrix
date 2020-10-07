@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import reactor.core.publisher.Mono;
 
+import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
+
 /**
  * The default repository to store apps in between their executions.
  */

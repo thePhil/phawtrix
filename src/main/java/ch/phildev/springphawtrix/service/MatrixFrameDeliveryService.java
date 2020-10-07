@@ -1,5 +1,8 @@
 package ch.phildev.springphawtrix.service;
 
+
+import java.awt.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -7,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
 import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
+import ch.phildev.springphawtrix.domain.MatrixFrame;
 import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import ch.phildev.springphawtrix.web.rest.dto.AnswerDto;
 
@@ -21,6 +25,10 @@ public class MatrixFrameDeliveryService {
         this.connectHandler = connectHandler;
         this.publishHandler = publishHandler;
         this.commandEncoder = commandEncoder;
+    }
+
+    public Mono<Void> publishFramesToMatrix(Flux<MatrixFrame> frames) {
+
     }
 
     public Mono<AnswerDto> publishFrameToMatrix(Flux<byte[]> payloadForMatrix) {

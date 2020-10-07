@@ -7,14 +7,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 import ch.phildev.springphawtrix.domain.Coordinates;
 
 @Value(staticConstructor = "of")
 @Builder
-@RequiredArgsConstructor
 @NonNull
 @JsonDeserialize(builder = DrawRectangleDto.DrawRectangleDtoBuilder.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)

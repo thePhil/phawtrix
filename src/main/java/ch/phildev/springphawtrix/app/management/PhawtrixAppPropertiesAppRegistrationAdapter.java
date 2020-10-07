@@ -4,10 +4,12 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.PropertyMapper;
+
+import ch.phildev.springphawtrix.app.domain.AppRegistration;
+import ch.phildev.springphawtrix.app.management.config.PhawtrixAppProperties;
 
 @NoArgsConstructor(force = true,access = AccessLevel.PRIVATE)
 public final class PhawtrixAppPropertiesAppRegistrationAdapter {

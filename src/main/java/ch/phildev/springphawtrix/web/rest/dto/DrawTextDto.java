@@ -12,7 +12,7 @@ import lombok.Value;
 import ch.phildev.springphawtrix.domain.Coordinates;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 @RequiredArgsConstructor
 @NonNull
 @JsonDeserialize(builder = DrawTextDto.DrawTextDtoBuilder.class)

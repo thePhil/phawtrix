@@ -2,7 +2,16 @@ package ch.phildev.springphawtrix.app.domain;
 
 import reactor.core.publisher.Flux;
 
+import ch.phildev.springphawtrix.domain.MatrixFrame;
+
 public interface PhawtrixApp {
+
+    /**
+     * Return the app registration, that describes this app
+     *
+     * @return provide the app registration
+     */
+    AppRegistration getAppRegistration();
 
     /**
      * Initialize the app and prepare for usage, so that the execute method can be called to ensure it can produce
@@ -19,7 +28,7 @@ public interface PhawtrixApp {
      *
      * @return a frame as described before
      */
-    Flux<byte[]> execute();
+    Flux<MatrixFrame> execute();
 
     /**
      * Stop or pause the execution of the app

@@ -1,11 +1,14 @@
-package ch.phildev.springphawtrix.app.management;
+package ch.phildev.springphawtrix.app.management.config;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import ch.phildev.springphawtrix.app.domain.AppRegistration;
+import ch.phildev.springphawtrix.app.management.DefaultInMemoryAppRegistrationRepository;
+import ch.phildev.springphawtrix.app.management.PhawtrixAppPropertiesAppRegistrationAdapter;
 
 public class ReactivePhawtrixAppConfigurations {
 

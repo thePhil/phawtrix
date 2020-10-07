@@ -6,14 +6,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 import ch.phildev.springphawtrix.domain.Coordinates;
 
 @Value(staticConstructor = "of")
 @Builder
-@RequiredArgsConstructor
 @NonNull
 @JsonDeserialize(builder = DrawBmpDto.DrawBmpDtoBuilder.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)

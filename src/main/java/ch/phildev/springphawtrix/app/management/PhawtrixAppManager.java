@@ -14,10 +14,10 @@ import ch.phildev.springphawtrix.service.MatrixFrameDeliveryService;
  * <ol>
  *     <li>Initializing the app for usage <br>
  *         Done via {@link PhawtrixApp#init()}</li>
- *     <li>Persistance of the initialized app in {@link AppRepository} by delegating to the
+ *     <li>Persistance of the initialized app in {@link ReactivePhawtrixAppRepositoryService} by delegating to the
  *     {@link ReactivePhawtrixAppRepositoryService}</li>
  *     <li>Executing the app
- *          <ul><li>Load from {@link AppRepository} with {@link ReactivePhawtrixAppRepositoryService}</li>
+ *          <ul><li>Load from {@link ReactivePhawtrixAppRepositoryService} with {@link ReactivePhawtrixAppRepositoryService}</li>
  *          <li>Stick into {@link PhawtrixCurrentAppHolder}</li>
  *          <li>Executing by using {@link PhawtrixApp#execute()}</li></ul>
  *     </li>
