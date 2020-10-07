@@ -32,6 +32,6 @@ public class PhawtrixAppProperties {
     public static class Registration {
         private String appId;
         private String authorName;
-        private String version;
+        private String version = "0.0.1";
     }
 }

@@ -36,7 +36,7 @@ The matrix expects messages in the format of byte arrays, where the first byte o
 | `0x13` | SetBrightness |                  |                           |
 | `0x14` | SaveConfig    |                  |                           |
 | `0x15` | ResetWifi     |                  |                           |
-| `0x16` | Ping          |                  | Send a ping to the server |
+| `0x16` | Ping          |                  | Send a ping back to the server |
 
 
 ## Encoding of coordinates

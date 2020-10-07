@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.PropertyMapper;

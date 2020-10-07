@@ -1,0 +1,19 @@
+@startuml
+
+
+class AppRegistration
+Interface AppRepository
+class DefaultInMemoryAppRepository
+
+interface PhawtrixApp
+interface PhawtrixAppManager
+class PhawtrixAppProperties
+class PhawtrixAppPropertiesAppRegistrationAdapter
+interface ReactivePhawtrixAppRepositoryService
+class ReactivePhawtrixAppConfigurations
+
+AppRepository <|-- DefaultInMemoryAppRepository
+
+DefaultInMemoryAppRepository "1" o-- "n" PhawtrixApp
+
+@enduml

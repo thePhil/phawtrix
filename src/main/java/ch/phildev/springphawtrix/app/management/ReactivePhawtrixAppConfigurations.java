@@ -3,6 +3,7 @@ package ch.phildev.springphawtrix.app.management;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
