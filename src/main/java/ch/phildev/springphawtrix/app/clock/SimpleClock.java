@@ -3,6 +3,7 @@ package ch.phildev.springphawtrix.app.clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -36,24 +37,21 @@ public class SimpleClock implements PhawtrixApp {
 
     @Override
     public Flux<MatrixFrame> execute() {
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_LOCAL_TIME;
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_INSTANT;
         Coordinates clockCoordinates = Coordinates.builder()
                 .x(0).y(0).build();
 
-        DrawTextDto drawTextDtoTemplate = DrawTextDto.builder()
+        DrawTextDto.DrawTextDtoBuilder drawTextDtoTemplate = DrawTextDto.builder()
                 .coordinates(clockCoordinates)
-                .hexTextColor("#000000")
-                .text(timeFormatter.format(Instant.now()))
-                .build();
+                .hexTextColor("#000000");
         return Flux.interval(Duration.ofSeconds(1L), Schedulers.single())
-                .map(interval ->
-                        MatrixFrame.builder()
-                                .frameNumber(interval)
-                                .frameBuffer(
-                                        List.of(matrixTextCommandProvider.textDeliverFrame(
-                                                drawTextDtoTemplate.toBuilder().text(timeFormatter.format(Instant.now())).build()
-                                        ))
-                                ).build());
+                .map(interval -> MatrixFrame.builder()
+                        .frameNumber(interval)
+                        .frameBuffer(
+                                List.of(matrixTextCommandProvider.textDeliverFrame(
+                                        drawTextDtoTemplate.text(timeFormatter.format(Instant.now().truncatedTo(ChronoUnit.SECONDS))).build()
+                                ))
+                        ).build());
     }
 
     @Override

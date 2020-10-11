@@ -1,8 +1,6 @@
 package ch.phildev.springphawtrix.service;
 
 
-import java.awt.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -28,7 +26,7 @@ public class MatrixFrameDeliveryService {
     }
 
     public Mono<Void> publishFramesToMatrix(Flux<MatrixFrame> frames) {
-
+        return Mono.empty();
     }
 
     public Mono<AnswerDto> publishFrameToMatrix(Flux<byte[]> payloadForMatrix) {
