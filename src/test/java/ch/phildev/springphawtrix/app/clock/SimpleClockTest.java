@@ -50,12 +50,15 @@ class SimpleClockTest {
     void execute() {
         Mockito.when(textProvider.textDeliverFrame(Mockito.any())).thenReturn("something".getBytes(StandardCharsets.UTF_8));
 
-        StepVerifier.create(testClock.execute().take(3L))
+        StepVerifier.withVirtualTime(() -> testClock.execute().take(3))
                 .expectSubscription()
+                .expectNoEvent(Duration.ofSeconds(1))
                 .expectNextMatches(frame -> frame.getFrameNumber() == 0L)
-                .thenAwait(Duration.ofSeconds(1L))
+                .thenAwait(Duration.ofSeconds(1))
                 .expectNextMatches(frame -> frame.getFrameNumber() == 1L)
+                .thenAwait(Duration.ofSeconds(1))
                 .expectNextCount(1L)
-                .verifyComplete();
+                .expectComplete()
+                .verify(Duration.ofMillis(200));
     }
 }
