@@ -1,10 +1,6 @@
 package ch.phildev.springphawtrix.communicator;
 
-import javax.validation.constraints.NotNull;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.util.stream.IntStream;
-
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 import com.google.common.io.BaseEncoding;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
@@ -15,7 +11,10 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import jakarta.validation.constraints.NotNull;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.stream.IntStream;
 
 @Component
 @Slf4j
@@ -75,7 +74,7 @@ public class PublishToMatrixHandler {
     }
 
 
-    private static Flux<String> convertPublishResultsToReadableString(Flux<Mqtt3PublishResult> pubResults) {
+    public static Flux<String> convertPublishResultsToReadableString(Flux<Mqtt3PublishResult> pubResults) {
         Flux<Integer> sequenceFlux = Flux.fromStream(IntStream.iterate(0, i -> i + 1).boxed());
 
         return pubResults

@@ -1,6 +1,6 @@
 package ch.phildev.springphawtrix.app.management.config;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 

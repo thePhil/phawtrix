@@ -1,6 +1,6 @@
 package ch.phildev.springphawtrix.web.rest;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

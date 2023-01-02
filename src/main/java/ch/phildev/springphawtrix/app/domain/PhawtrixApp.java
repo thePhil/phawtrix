@@ -1,6 +1,7 @@
 package ch.phildev.springphawtrix.app.domain;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import ch.phildev.springphawtrix.domain.MatrixFrame;
 
@@ -32,6 +33,7 @@ public interface PhawtrixApp {
 
     /**
      * Stop or pause the execution of the app
+     * @return
      */
-    void stop();
+    Mono<Void> stop();
 }

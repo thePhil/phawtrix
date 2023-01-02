@@ -1,14 +1,20 @@
 package ch.phildev.springphawtrix.config;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+@EnableWebFluxSecurity
 public class WebSecurityConfig {
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) {
+
+    @Bean
+    public SecurityWebFilterChain springSecurityWebFilterChain(ServerHttpSecurity httpSecurity) {
+
         httpSecurity
-                .authorizeExchange().pathMatchers("/**").permitAll();
+                .csrf().disable()
+                .authorizeExchange().anyExchange().permitAll();
 
-
-       return  httpSecurity.build();
+        return httpSecurity.build();
     }
 }

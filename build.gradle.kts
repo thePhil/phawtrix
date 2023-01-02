@@ -13,14 +13,14 @@ plugins {
     java
     idea
     `maven-publish`
-    id("org.springframework.boot") version "2.3.4.RELEASE"
-    id("io.spring.dependency-management") version "1.0.10.RELEASE"
-    id("com.github.ben-manes.versions") version "0.33.0"
+    id("org.springframework.boot") version "3.0.1"
+    id("io.spring.dependency-management") version "1.1.0"
+    id("com.github.ben-manes.versions") version "0.44.0"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 idea {
     module {
@@ -29,10 +29,11 @@ idea {
     }
 }
 
-val mqttVersion = "1.2.1"
-val guavaVersion = "29.0-jre"
-val webfluxDocVersion = "1.4.6"
-val jetBrainsAnnotationVersion = "20.1.0"
+val mqttVersion = "1.3.0"
+val guavaVersion = "31.1-jre"
+val webfluxDocVersion = "1.6.14"
+val jetBrainsAnnotationVersion = "23.1.0"
+val lombokVersion = "1.18.24"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -47,15 +48,14 @@ dependencies {
     implementation("org.jetbrains", "annotations", jetBrainsAnnotationVersion)
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    implementation("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
+    compileOnly("org.projectlombok","lombok",lombokVersion)
+    annotationProcessor("org.projectlombok","lombok",lombokVersion)
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.assertj:assertj-core")
-    testImplementation("org.projectlombok:lombok")
-    testAnnotationProcessor("org.projectlombok:lombok")
-    testAnnotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    testCompileOnly("org.projectlombok","lombok",lombokVersion)
+    testAnnotationProcessor("org.projectlombok","lombok",lombokVersion)
 
 }
 

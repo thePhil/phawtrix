@@ -1,6 +1,9 @@
 package ch.phildev.springphawtrix.service;
 
 
+import com.google.common.io.BaseEncoding;
+import org.springframework.stereotype.Component;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -10,9 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Base64;
-
-import com.google.common.io.BaseEncoding;
-import org.springframework.stereotype.Component;
 
 @Component
 public class BmpHandlerImpl implements BmpHandler {

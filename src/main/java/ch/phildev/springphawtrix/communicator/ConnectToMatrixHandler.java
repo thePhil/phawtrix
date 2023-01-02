@@ -39,6 +39,7 @@ public class ConnectToMatrixHandler {
                     subscribeToMatrixHandler.goodConnected(mqtt3ConnAck);
                 })
                 .retry(cfg.getRetryTimes())
+                .doOnNext( mqtt3ConnAck ->  log.debug("Retry"))
                 .doOnError(throwable -> log.error("Could not connect to Broker: " + cfg.getBrokerHost() + " \n" +
                                                   "with error message: " + throwable.getMessage(), throwable))
                 .checkpoint("Connection Scenario")

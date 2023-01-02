@@ -1,7 +1,8 @@
 package ch.phildev.springphawtrix.app.management;
 
-import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
 import reactor.core.publisher.Mono;
+
+import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
 
 /**
  * Implementations of this interface store and persist {@link PhawtrixApp}s between
@@ -26,4 +27,6 @@ public interface ReactivePhawtrixAppRepositoryService<T extends PhawtrixApp> {
      * @param app the app to save
      */
     Mono<Void> savePhawtrixApp(T app);
+
+    int numberOfStoredApps();
 }

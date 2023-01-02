@@ -1,8 +1,10 @@
 package ch.phildev.springphawtrix.app.clock;
 
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-
+import ch.phildev.springphawtrix.app.domain.AppRegistration;
+import ch.phildev.springphawtrix.app.management.AppDrawingComponentHolder;
+import ch.phildev.springphawtrix.service.ColorHandler;
+import ch.phildev.springphawtrix.service.CommandEncoder;
+import ch.phildev.springphawtrix.service.MatrixTextCommandProvider;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +14,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.test.StepVerifier;
 
-import ch.phildev.springphawtrix.app.domain.AppRegistration;
-import ch.phildev.springphawtrix.service.MatrixTextCommandProvider;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 @ExtendWith(MockitoExtension.class)
 class SimpleClockTest {
@@ -28,6 +30,10 @@ class SimpleClockTest {
 
     @Mock
     private MatrixTextCommandProvider textProvider;
+    @Mock
+    private ColorHandler colorHandler;
+    @Mock
+    private CommandEncoder commandEncoder;
 
     @BeforeEach
     void setUp() {
@@ -37,8 +43,13 @@ class SimpleClockTest {
                 .appName(APP_NAME)
                 .build();
 
+        AppDrawingComponentHolder componentHolder = AppDrawingComponentHolder.builder()
+                .colorHandler(colorHandler)
+                .commandEncoder(commandEncoder)
+                .matrixTextCommandProvider(textProvider).build();
 
-        testClock = new SimpleClock(simpleAppRegistration, textProvider);
+
+        testClock = new SimpleClock(simpleAppRegistration, componentHolder);
     }
 
     @Test

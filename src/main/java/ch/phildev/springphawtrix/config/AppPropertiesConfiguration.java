@@ -8,5 +8,6 @@ import ch.phildev.springphawtrix.app.management.config.ReactivePhawtrixAppConfig
 
 @EnableConfigurationProperties(PhawtrixAppProperties.class)
 @Import(ReactivePhawtrixAppConfigurations.class)
-public class AppConfiguration {
+public class AppPropertiesConfiguration {
+
 }

@@ -4,6 +4,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
+import ch.phildev.springphawtrix.domain.MatrixFrame;
 import ch.phildev.springphawtrix.service.MatrixFrameDeliveryService;
 
 /**
@@ -14,7 +15,7 @@ import ch.phildev.springphawtrix.service.MatrixFrameDeliveryService;
  * <ol>
  *     <li>Initializing the app for usage <br>
  *         Done via {@link PhawtrixApp#init()}</li>
- *     <li>Persistance of the initialized app in {@link ReactivePhawtrixAppRepositoryService} by delegating to the
+ *     <li>Persistence of the initialized app in {@link ReactivePhawtrixAppRepositoryService} by delegating to the
  *     {@link ReactivePhawtrixAppRepositoryService}</li>
  *     <li>Executing the app
  *          <ul><li>Load from {@link ReactivePhawtrixAppRepositoryService} with {@link ReactivePhawtrixAppRepositoryService}</li>
@@ -41,9 +42,9 @@ public interface PhawtrixAppManager {
      * so that it can be loaded to run.
      *
      * @param appName
-     * @return the app initialized
+     * @return Void, initialized app is in repository
      */
-    Mono<PhawtrixApp> initApp(String appName);
+    Mono<Void> initApp(String appName);
 
     /**
      * Execute the app and return the currently executing app
@@ -51,7 +52,7 @@ public interface PhawtrixAppManager {
      * @param appName
      * @return
      */
-    Mono<PhawtrixApp> executeApp(String appName);
+    Flux<MatrixFrame> executeApp(String appName);
 
     /**
      * Stop the app running with the given AppName and cleanup the app.
@@ -59,6 +60,6 @@ public interface PhawtrixAppManager {
      * @param appName
      * @return
      */
-    Mono<PhawtrixApp> stopApp(String appName);
+    Mono<Void> stopApp(String appName);
 
 }

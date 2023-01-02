@@ -1,16 +1,16 @@
 package ch.phildev.springphawtrix.domain;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import java.beans.Transient;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+
+import java.beans.Transient;
 
 @Builder(toBuilder = true)
 @Value(staticConstructor = "of")

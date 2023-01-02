@@ -13,6 +13,12 @@ phawtrix:
   matrixSubscribeTopic: matrixClient
   retryTimes: 5
   timeoutMs: 1000
+  app:
+    registration:
+      simpleClock:
+        appId: SimpleClock
+        authorName: me
+
 
 
 #debug: true

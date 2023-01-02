@@ -25,8 +25,8 @@ public class MatrixFrameDeliveryService {
         this.commandEncoder = commandEncoder;
     }
 
-    public Mono<Void> publishFramesToMatrix(Flux<MatrixFrame> frames) {
-        return Mono.empty();
+    public String publishFramesToMatrix(MatrixFrame frames) {
+        return "";
     }
 
     public Mono<AnswerDto> publishFrameToMatrix(Flux<byte[]> payloadForMatrix) {

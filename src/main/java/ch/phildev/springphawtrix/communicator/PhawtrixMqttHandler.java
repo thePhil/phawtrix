@@ -1,6 +1,6 @@
 package ch.phildev.springphawtrix.communicator;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 import com.hivemq.client.mqtt.MqttClient;
