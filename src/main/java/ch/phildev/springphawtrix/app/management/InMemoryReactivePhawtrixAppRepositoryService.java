@@ -23,13 +23,13 @@ public class InMemoryReactivePhawtrixAppRepositoryService implements ReactivePha
     }
 
     @Override
-    public Mono<Void> savePhawtrixApp(PhawtrixApp app) {
-        return Mono.fromRunnable(() -> {
+    public Mono<PhawtrixApp> savePhawtrixApp(PhawtrixApp app) {
             log.debug("Before app save, and {} stored", apps.size());
-            PhawtrixApp appSaved = this.apps.put(app.getAppRegistration().getAppName(), app);
-            log.debug("Saved app {} with key {} and {} stored.", appSaved, app.getAppRegistration().getAppName(),
+            this.apps.put(app.getAppRegistration().getAppName(), app);
+            log.debug("Saved app {} with key {} and {} stored.", app, app.getAppRegistration().getAppName(),
                     apps.size());
-        });
+            log.debug(apps.toString());
+            return Mono.just(app);
     }
 
     @Override

@@ -1,5 +1,12 @@
 package ch.phildev.springphawtrix.web.rest;
 
+import ch.phildev.springphawtrix.app.management.PhawtrixAppManager;
+import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
+import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
+import ch.phildev.springphawtrix.domain.MatrixFrame;
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,10 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import ch.phildev.springphawtrix.app.management.PhawtrixAppManager;
-import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
-import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import java.nio.ByteBuffer;
 
 @RestController
 @Slf4j
@@ -28,8 +34,7 @@ public class AppResource {
     private final Mqtt3ReactorClient client;
     private final PhawtrixMqttConfig cfg;
 
-    @GetMapping(value = "/command/{appName}/execute",
-            produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/command/{appName}/execute", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<String> executeApp(@PathVariable String appName) {
         Assert.hasText(appName, "AppName must be given");
         log.debug("reached the controller");
@@ -38,9 +43,9 @@ public class AppResource {
                 .checkpoint()
                 .then(appManager.initApp(appName))
                 .checkpoint()
-                .flux()
-                .zipWith(appManager.executeApp(appName))
-                .map(t -> t.getT2().toString());
+                .thenMany(appManager.executeApp(appName))
+                .map(t -> t.toString())
+                .doOnNext(pub -> log.debug(pub));
 //                .flatMapIterable(MatrixFrame::getFrameBuffer)
 //                .map(frameBytes -> Mqtt3Publish.builder()
 //                        .topic(cfg.getMatrixPublishTopic())
@@ -50,5 +55,37 @@ public class AppResource {
 //                .publish(client::publish)
 //                .doOnNext(pub -> log.debug("Publish result: {}", pub.getPublish()))
 //                .transformDeferred(PublishToMatrixHandler::convertPublishResultsToReadableString);
+    }
+
+    @GetMapping(value = "/command/{appName}/executeAndForget",
+            consumes = MediaType.ALL_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<String> executeAppAsync(@PathVariable String appName) {
+
+        Assert.hasText(appName, "AppName must be given");
+        log.debug("reached the controller");
+
+        return connectToMatrixHandler.connectScenario()
+                .checkpoint()
+                .then(appManager.initApp(appName))
+                .doOnSuccess(data -> log.debug("App is initialized"))
+                .checkpoint()
+                .doOnSuccess(data -> appManager.executeApp(appName)
+                        .transform(this::publishToMatrix)
+                        .subscribe())
+                .map(sub -> "Successfully fired");
+    }
+
+    private Flux<String> publishToMatrix(Flux<MatrixFrame> executionFrame) {
+        return executionFrame
+                .flatMapIterable(MatrixFrame::getFrameBuffer)
+                .map(frameBytes -> Mqtt3Publish.builder()
+                        .topic(cfg.getMatrixPublishTopic())
+                        .qos(MqttQos.AT_LEAST_ONCE)
+                        .payload(ByteBuffer.wrap(frameBytes))
+                        .build())
+                .publish(client::publish)
+                .doOnNext(pub -> log.debug("Publish result: {}", pub.getPublish()))
+                .transformDeferred(PublishToMatrixHandler::convertPublishResultsToReadableString);
     }
 }

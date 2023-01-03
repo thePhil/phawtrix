@@ -31,7 +31,7 @@ idea {
 
 val mqttVersion = "1.3.0"
 val guavaVersion = "31.1-jre"
-val webfluxDocVersion = "1.6.14"
+val webfluxDocVersion = "2.0.2"
 val jetBrainsAnnotationVersion = "23.1.0"
 val lombokVersion = "1.18.24"
 dependencies {
@@ -41,7 +41,7 @@ dependencies {
 
     implementation("org.springframework.security:spring-security-oauth2-client")
     implementation("com.google.code.gson:gson")
-    implementation("org.springdoc", "springdoc-openapi-webflux-ui", webfluxDocVersion)
+    implementation("org.springdoc", "springdoc-openapi-starter-webflux-ui", webfluxDocVersion)
     implementation("com.hivemq", "hivemq-mqtt-client", mqttVersion)
     implementation("com.hivemq", "hivemq-mqtt-client-reactor", mqttVersion)
     implementation("com.google.guava", "guava", guavaVersion)

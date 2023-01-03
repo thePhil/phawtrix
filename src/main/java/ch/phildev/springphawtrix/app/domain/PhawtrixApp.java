@@ -33,7 +33,7 @@ public interface PhawtrixApp {
 
     /**
      * Stop or pause the execution of the app
-     * @return
+     * @return Void
      */
     Mono<Void> stop();
 }

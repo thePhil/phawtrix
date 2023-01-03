@@ -1,15 +1,16 @@
 package ch.phildev.springphawtrix.service;
 
-import java.nio.charset.StandardCharsets;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import ch.phildev.springphawtrix.domain.PhawtrixCommand;
 import ch.phildev.springphawtrix.web.rest.dto.DrawTextDto;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class MatrixTextCommandProviderImpl implements MatrixTextCommandProvider {
     private final CommandEncoder commandEncoder;
     private final CoordinateDecoder coordinateDecoder;

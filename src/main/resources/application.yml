@@ -18,6 +18,9 @@ phawtrix:
       simpleClock:
         appId: SimpleClock
         authorName: me
+      easyClock:
+        appId: EasyClock
+        authorName: me
 
 
 

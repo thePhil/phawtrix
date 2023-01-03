@@ -1,13 +1,12 @@
 package ch.phildev.springphawtrix.web.rest;
 
-import jakarta.validation.Valid;
-import java.awt.*;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
+import ch.phildev.springphawtrix.domain.Coordinates;
+import ch.phildev.springphawtrix.domain.PhawtrixCommand;
+import ch.phildev.springphawtrix.service.*;
+import ch.phildev.springphawtrix.web.rest.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,21 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import ch.phildev.springphawtrix.domain.Coordinates;
-import ch.phildev.springphawtrix.domain.PhawtrixCommand;
-import ch.phildev.springphawtrix.service.BmpHandler;
-import ch.phildev.springphawtrix.service.ByteHandler;
-import ch.phildev.springphawtrix.service.ColorHandler;
-import ch.phildev.springphawtrix.service.CommandEncoder;
-import ch.phildev.springphawtrix.service.CoordinateDecoder;
-import ch.phildev.springphawtrix.service.MatrixFrameDeliveryService;
-import ch.phildev.springphawtrix.web.rest.dto.AnswerDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawBmpDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawCircleDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawLineDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawPixelDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawRectangleDto;
-import ch.phildev.springphawtrix.web.rest.dto.DrawTextDto;
+import java.awt.*;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -138,7 +126,7 @@ public class DrawMatrixResource {
                     The coordinates specified, mark the location of the pixel.
 
                     ### Color
-                    The color has to be specified as hex string in it's usual format `#000000` for black. """)
+                    The color has to be specified as hex string in it's usual format `#000000` for black.""")
     @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
                                                      "string.")
     public Mono<AnswerDto> drawPixel(@RequestBody @Valid DrawPixelDto drawPixelDto) {
@@ -179,7 +167,7 @@ public class DrawMatrixResource {
                     * The height is speicifed as number of pixels height (downwards from the root pixel corner)
 
                     ### Color
-                    The color has to be specified as hex string in it's usual format `#000000` for black. """)
+                    The color has to be specified as hex string in it's usual format `#000000` for black.""")
     @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
                                                      "string.")
     public Mono<AnswerDto> drawRectangle(@RequestBody @Valid DrawRectangleDto rectangleDto) {
@@ -208,7 +196,7 @@ public class DrawMatrixResource {
                     * The second coordinate marks the end point of the line
 
                     ### Color
-                    The color has to be specified as hex string in it's usual format `#000000` for black. """)
+                    The color has to be specified as hex string in it's usual format `#000000` for black.""")
     @ApiResponse(responseCode = "200", description = "The payload send to the matrix in it's raw form as hex encoded " +
                                                      "string.")
     public Mono<AnswerDto> drawLine(@RequestBody @Valid DrawLineDto lineDto) {

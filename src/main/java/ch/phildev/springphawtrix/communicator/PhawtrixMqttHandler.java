@@ -1,16 +1,15 @@
 package ch.phildev.springphawtrix.communicator;
 
-import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
-
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
 import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -32,7 +31,7 @@ public class PhawtrixMqttHandler {
         //building the client
         return MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(cfg.getIdentifier() + UUID.randomUUID().toString())
+                .identifier(cfg.getIdentifier() + UUID.randomUUID())
                 .serverHost(cfg.getBrokerHost())
                 .automaticReconnectWithDefaultConfig()
                 .build();

@@ -38,8 +38,10 @@ public interface PhawtrixAppManager {
      * This will ensure the app is ready to go and all preconditions to successfully
      * run the app have been pre-filled.
      * <p>
-     * Also the app has been persisted to the {@link ReactivePhawtrixAppRepositoryService}
+     * Also, the app has been persisted to the {@link ReactivePhawtrixAppRepositoryService}
      * so that it can be loaded to run.
+     *
+     * Calls to this function are idempotent, there can only ever exist one app instance of an app.
      *
      * @param appName
      * @return Void, initialized app is in repository

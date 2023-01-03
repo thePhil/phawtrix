@@ -21,12 +21,13 @@ public interface ReactivePhawtrixAppRepositoryService<T extends PhawtrixApp> {
      */
     Mono<T> loadPhawtrixApp(String appName);
 
+
     /**
      * Saves a ready to go {@link PhawtrixApp} into the AppRepository.
      *
      * @param app the app to save
      */
-    Mono<Void> savePhawtrixApp(T app);
+    Mono<PhawtrixApp> savePhawtrixApp(T app);
 
     int numberOfStoredApps();
 }
