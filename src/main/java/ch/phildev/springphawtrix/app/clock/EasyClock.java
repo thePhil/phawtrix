@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Slf4j
@@ -53,11 +54,11 @@ public class EasyClock implements PhawtrixApp {
 
         Flux<MatrixFrame> theFlux = Flux.generate(() -> emptyFrame, (f, matrixFrameSynchronousSink) -> {
             String frameContent = getFormattedCurrentTime();
-            log.debug(frameContent);
+            log.trace(frameContent);
             DrawTextDto dto = drawTextDtoTemplate.text(frameContent).build();
-            log.debug(dto.toString());
+            log.trace(dto.toString());
             byte[] del = matrixTextCommandProvider.textDeliverFrame(dto);
-            log.debug(BaseEncoding.base16().encode(del));
+            log.trace(BaseEncoding.base16().encode(del));
 
             MatrixFrame frame = MatrixFrame.builder()
                     .frameBuffer(List.of(del))
@@ -69,28 +70,6 @@ public class EasyClock implements PhawtrixApp {
         return theFlux
                 .doOnSubscribe(sub -> log.debug("Got Subscribed by {} ", sub))
                 .doOnNext(data -> log.debug("Frame: {}", data));
-
-//        return Flux.just(MatrixFrame.builder()
-//                .frameBuffer(
-//                        List.of(matrixTextCommandProvider.textDeliverFrame(
-//                                drawTextDtoTemplate.text(getFormattedCurrentTime())
-//                                        .build()
-//                        ))
-//                ).build())
-//                .doOnSubscribe(sub -> log.debug("Got Subscribed by {} ", sub))
-//                .doOnNext(data -> log.debug("Frame: {}", data))
-//                .share();
-//
-//        return Flux.fromIterable(List.of(
-//                MatrixFrame.builder()
-//                        .frameBuffer(
-//                                List.of(matrixTextCommandProvider.textDeliverFrame(
-//                                        drawTextDtoTemplate.text(timeFormatter.format(Instant.now().truncatedTo(ChronoUnit.SECONDS)))
-//                                                .build()
-//                                ))
-//                        ).build())
-//        ).share();
-
     }
 
     @Override
@@ -99,8 +78,6 @@ public class EasyClock implements PhawtrixApp {
     }
 
     private String getFormattedCurrentTime() {
-//        return timeFormatter.format(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        String o = timeFormatter.format(Instant.now());
-        return o;
+        return timeFormatter.format(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     }
 }

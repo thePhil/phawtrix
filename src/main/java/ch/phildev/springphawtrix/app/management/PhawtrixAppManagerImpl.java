@@ -4,7 +4,10 @@ import ch.phildev.springphawtrix.app.clock.EasyClock;
 import ch.phildev.springphawtrix.app.clock.SimpleClock;
 import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
+import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
 import ch.phildev.springphawtrix.domain.MatrixFrame;
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -13,6 +16,8 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
@@ -22,16 +27,28 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
     private final ReactivePhawtrixAppRepositoryService<PhawtrixApp> appRepositoryService;
     private final AppRegistrationRepository appRegistrationRepository;
 
+    // to be moved to a different component e.g. a publishHandler or similar
+    private final ConnectToMatrixHandler connectToMatrixHandler;
+    private final Mqtt3ReactorClient client;
+    private final PhawtrixMqttConfig cfg;
+
     private final Flux<Long> intervalFlux;
+
+    private final ConcurrentHashMap<String, AtomicInteger> subsPerApp;
+
 
     public PhawtrixAppManagerImpl(AppDrawingComponentHolder appDrawingComponentHolder,
                                   ReactivePhawtrixAppRepositoryService<PhawtrixApp> appRepositoryService,
-                                  AppRegistrationRepository appRegistrationRepository) {
+                                  AppRegistrationRepository appRegistrationRepository, ConnectToMatrixHandler connectToMatrixHandler, Mqtt3ReactorClient client, PhawtrixMqttConfig cfg) {
         this.appDrawingComponentHolder = appDrawingComponentHolder;
         this.appRepositoryService = appRepositoryService;
         this.appRegistrationRepository = appRegistrationRepository;
+        this.connectToMatrixHandler = connectToMatrixHandler;
+        this.client = client;
+        this.cfg = cfg;
 
         this.intervalFlux = Flux.interval(Duration.ofSeconds(1), Schedulers.single()).share();
+        subsPerApp = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -76,10 +93,20 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
                 .flatMapMany(PhawtrixApp::execute)
                 .doOnNext(frame -> log.debug("Frame number: {}", frame.getFrameNumber()));
 
+
+
         return intervalFlux.zipWith(appFlux, 1, (interval, frame) -> frame.toBuilder()
                         .frameNumber(interval)
                         .build())
-                .doOnNext(frame -> log.debug("Frame number: {}", frame.getFrameNumber()));
+                .doOnNext(frame -> log.debug("Frame number: {}", frame.getFrameNumber()))
+                .doOnSubscribe(sub -> {
+                    AtomicInteger numSubs = subsPerApp.computeIfAbsent(appName, k -> new AtomicInteger(0));
+                    numSubs.getAndIncrement();
+                    if (numSubs.getAcquire() > 1) {
+                        log.warn("To many subscribers, cancelling subscription");
+                        sub.cancel();
+                    }
+                });
     }
 
     @Override

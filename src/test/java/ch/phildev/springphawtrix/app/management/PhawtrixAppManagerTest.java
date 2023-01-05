@@ -3,6 +3,10 @@ package ch.phildev.springphawtrix.app.management;
 import ch.phildev.springphawtrix.app.clock.SimpleClock;
 import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
+import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import ch.phildev.springphawtrix.testutils.TestPhawtrixConfigBuilderFactory;
+import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +30,19 @@ class PhawtrixAppManagerTest {
     @Mock
     AppRegistrationRepository appRegistrationRepository;
 
+    @Mock
+    ConnectToMatrixHandler connectToMatrixHandler;
+    @Mock
+    Mqtt3ReactorClient client;
+
+    PhawtrixMqttConfig cfg;
+
     AppRegistration simpleAppRegistration;
 
     @BeforeEach
     void setUp() {
+
+        cfg = TestPhawtrixConfigBuilderFactory.aDefaultConfig().build();
 
         simpleAppRegistration = AppRegistration.builder()
                 .appAuthor(AUTHOR_NAME)
@@ -41,7 +54,12 @@ class PhawtrixAppManagerTest {
     void initAppWithAppRegistrationNotPresent() {
 
         // given
-        PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder, appRepositoryService, appRegistrationRepository);
+        PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder,
+                appRepositoryService,
+                appRegistrationRepository,
+                connectToMatrixHandler,
+                client,
+                cfg);
         Mockito.when(appRegistrationRepository.findByName(WRONG_APP_NAME))
                 .thenReturn(Mono.empty());
         // when
@@ -56,7 +74,12 @@ class PhawtrixAppManagerTest {
     void initApp() {
 
         // given
-        PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder, appRepositoryService, appRegistrationRepository);
+        PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder,
+                appRepositoryService,
+                appRegistrationRepository,
+                connectToMatrixHandler,
+                client,
+                cfg);
         Mockito.when(appRegistrationRepository.findByName(APP_NAME))
                 .thenReturn(Mono.just(simpleAppRegistration));
         Mockito.when(appRepositoryService.loadPhawtrixApp(APP_NAME))
@@ -82,7 +105,12 @@ class PhawtrixAppManagerTest {
     void validateThatAnAppIsProducedOnlyOnce() {
         // given
         SimpleClock testClock = new SimpleClock(simpleAppRegistration, appDrawingComponentHolder);
-        PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder, appRepositoryService, appRegistrationRepository);
+        PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder,
+                appRepositoryService,
+                appRegistrationRepository,
+                connectToMatrixHandler,
+                client,
+                cfg);
 
         Mockito.when(appRegistrationRepository.findByName(APP_NAME))
                 .thenReturn(Mono.just(simpleAppRegistration));
