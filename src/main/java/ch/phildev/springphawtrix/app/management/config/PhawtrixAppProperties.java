@@ -1,13 +1,13 @@
 package ch.phildev.springphawtrix.app.management.config;
 
 import jakarta.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ConfigurationProperties(prefix = "phawtrix.app")
 @Getter
@@ -33,5 +33,6 @@ public class PhawtrixAppProperties {
         private String appId;
         private String authorName;
         private String version = "0.0.1";
+        private int milliInterval = 1000;
     }
 }

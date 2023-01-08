@@ -21,6 +21,7 @@ phawtrix:
       easyClock:
         appId: EasyClock
         authorName: me
+        milliInterval: 1000
 
 
 

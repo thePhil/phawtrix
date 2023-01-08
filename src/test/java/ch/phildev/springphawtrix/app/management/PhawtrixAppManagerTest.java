@@ -3,7 +3,6 @@ package ch.phildev.springphawtrix.app.management;
 import ch.phildev.springphawtrix.app.clock.SimpleClock;
 import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
-import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
 import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
 import ch.phildev.springphawtrix.testutils.TestPhawtrixConfigBuilderFactory;
 import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
@@ -31,8 +30,6 @@ class PhawtrixAppManagerTest {
     AppRegistrationRepository appRegistrationRepository;
 
     @Mock
-    ConnectToMatrixHandler connectToMatrixHandler;
-    @Mock
     Mqtt3ReactorClient client;
 
     PhawtrixMqttConfig cfg;
@@ -57,7 +54,6 @@ class PhawtrixAppManagerTest {
         PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder,
                 appRepositoryService,
                 appRegistrationRepository,
-                connectToMatrixHandler,
                 client,
                 cfg);
         Mockito.when(appRegistrationRepository.findByName(WRONG_APP_NAME))
@@ -77,7 +73,6 @@ class PhawtrixAppManagerTest {
         PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder,
                 appRepositoryService,
                 appRegistrationRepository,
-                connectToMatrixHandler,
                 client,
                 cfg);
         Mockito.when(appRegistrationRepository.findByName(APP_NAME))
@@ -108,7 +103,6 @@ class PhawtrixAppManagerTest {
         PhawtrixAppManager appManager = new PhawtrixAppManagerImpl(appDrawingComponentHolder,
                 appRepositoryService,
                 appRegistrationRepository,
-                connectToMatrixHandler,
                 client,
                 cfg);
 

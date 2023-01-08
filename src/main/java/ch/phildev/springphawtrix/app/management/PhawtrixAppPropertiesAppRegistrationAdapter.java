@@ -30,6 +30,7 @@ public final class PhawtrixAppPropertiesAppRegistrationAdapter {
         mapper.from(registration::getAppId).to(appRegistrationBuilder::appName);
         mapper.from(registration::getAuthorName).to(appRegistrationBuilder::appAuthor);
         mapper.from(registration::getVersion).to(appRegistrationBuilder::version);
+        mapper.from(registration::getMilliInterval).to(appRegistrationBuilder::milliInterval);
 
         //TODO: Arguments
 
