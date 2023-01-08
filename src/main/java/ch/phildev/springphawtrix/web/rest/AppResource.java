@@ -31,8 +31,6 @@ public class AppResource {
 
     private final PhawtrixAppManager appManager;
     private final ConnectToMatrixHandler connectToMatrixHandler;
-    private final Mqtt3ReactorClient client;
-    private final PhawtrixMqttConfig cfg;
 
     @GetMapping(value = "/command/{appName}/execute", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<String> executeApp(@PathVariable String appName) {
@@ -46,15 +44,6 @@ public class AppResource {
                 .thenMany(appManager.executeApp(appName))
                 .map(t -> t.toString())
                 .doOnNext(pub -> log.debug(pub));
-//                .flatMapIterable(MatrixFrame::getFrameBuffer)
-//                .map(frameBytes -> Mqtt3Publish.builder()
-//                        .topic(cfg.getMatrixPublishTopic())
-//                        .qos(MqttQos.AT_LEAST_ONCE)
-//                        .payload(ByteBuffer.wrap(frameBytes))
-//                        .build())
-//                .publish(client::publish)
-//                .doOnNext(pub -> log.debug("Publish result: {}", pub.getPublish()))
-//                .transformDeferred(PublishToMatrixHandler::convertPublishResultsToReadableString);
     }
 
     @GetMapping(value = "/command/{appName}/executeAndForget",
@@ -71,21 +60,7 @@ public class AppResource {
                 .doOnSuccess(data -> log.debug("App is initialized"))
                 .checkpoint()
                 .doOnSuccess(data -> appManager.executeApp(appName)
-                        .transform(this::publishToMatrix)
                         .subscribe())
                 .map(sub -> "Successfully fired");
-    }
-
-    private Flux<String> publishToMatrix(Flux<MatrixFrame> executionFrame) {
-        return executionFrame
-                .flatMapIterable(MatrixFrame::getFrameBuffer)
-                .map(frameBytes -> Mqtt3Publish.builder()
-                        .topic(cfg.getMatrixPublishTopic())
-                        .qos(MqttQos.AT_LEAST_ONCE)
-                        .payload(ByteBuffer.wrap(frameBytes))
-                        .build())
-                .publish(client::publish)
-                .doOnNext(pub -> log.debug("Publish result: {}", pub.getPublish()))
-                .transformDeferred(PublishToMatrixHandler::convertPublishResultsToReadableString);
     }
 }

@@ -4,7 +4,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
-import ch.phildev.springphawtrix.domain.MatrixFrame;
 import ch.phildev.springphawtrix.service.MatrixFrameDeliveryService;
 
 /**
@@ -54,7 +53,7 @@ public interface PhawtrixAppManager {
      * @param appName
      * @return
      */
-    Flux<MatrixFrame> executeApp(String appName);
+    Flux<String> executeApp(String appName);
 
     /**
      * Stop the app running with the given AppName and cleanup the app.

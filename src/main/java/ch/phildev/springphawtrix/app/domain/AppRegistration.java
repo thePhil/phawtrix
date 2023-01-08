@@ -22,5 +22,5 @@ public final class AppRegistration {
     private String appAuthor;
     private String version;
     private Map<String, String> arguments;
-
+    private Integer milliInterval;
 }

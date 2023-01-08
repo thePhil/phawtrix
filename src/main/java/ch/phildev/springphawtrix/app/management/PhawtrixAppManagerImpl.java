@@ -5,16 +5,19 @@ import ch.phildev.springphawtrix.app.clock.SimpleClock;
 import ch.phildev.springphawtrix.app.domain.AppRegistration;
 import ch.phildev.springphawtrix.app.domain.PhawtrixApp;
 import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
+import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
 import ch.phildev.springphawtrix.domain.MatrixFrame;
 import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
+import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,14 +35,15 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
     private final Mqtt3ReactorClient client;
     private final PhawtrixMqttConfig cfg;
 
-    private final Flux<Long> intervalFlux;
-
     private final ConcurrentHashMap<String, AtomicInteger> subsPerApp;
 
 
     public PhawtrixAppManagerImpl(AppDrawingComponentHolder appDrawingComponentHolder,
                                   ReactivePhawtrixAppRepositoryService<PhawtrixApp> appRepositoryService,
-                                  AppRegistrationRepository appRegistrationRepository, ConnectToMatrixHandler connectToMatrixHandler, Mqtt3ReactorClient client, PhawtrixMqttConfig cfg) {
+                                  AppRegistrationRepository appRegistrationRepository,
+                                  ConnectToMatrixHandler connectToMatrixHandler,
+                                  Mqtt3ReactorClient client,
+                                  PhawtrixMqttConfig cfg) {
         this.appDrawingComponentHolder = appDrawingComponentHolder;
         this.appRepositoryService = appRepositoryService;
         this.appRegistrationRepository = appRegistrationRepository;
@@ -47,7 +51,6 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
         this.client = client;
         this.cfg = cfg;
 
-        this.intervalFlux = Flux.interval(Duration.ofSeconds(1), Schedulers.single()).share();
         subsPerApp = new ConcurrentHashMap<>();
     }
 
@@ -81,7 +84,7 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
 
 
     @Override
-    public Flux<MatrixFrame> executeApp(String appName) {
+    public Flux<String> executeApp(String appName) {
         Assert.hasText(appName, "A valid app name must be given");
 
         Flux<MatrixFrame> appFlux = Mono.just(appName)
@@ -91,14 +94,9 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
                 .checkpoint()
                 .doOnSuccess(app -> log.debug("App {} has been loaded, start execution.", app.getAppRegistration().getAppName()))
                 .flatMapMany(PhawtrixApp::execute)
-                .doOnNext(frame -> log.debug("Frame number: {}", frame.getFrameNumber()));
-
-
-
-        return intervalFlux.zipWith(appFlux, 1, (interval, frame) -> frame.toBuilder()
-                        .frameNumber(interval)
-                        .build())
                 .doOnNext(frame -> log.debug("Frame number: {}", frame.getFrameNumber()))
+                .limitRate(1)
+                .delayElements(Duration.ofSeconds(1))
                 .doOnSubscribe(sub -> {
                     AtomicInteger numSubs = subsPerApp.computeIfAbsent(appName, k -> new AtomicInteger(0));
                     numSubs.getAndIncrement();
@@ -107,6 +105,9 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
                         sub.cancel();
                     }
                 });
+
+
+                return appFlux.transformDeferred(this::publishToMatrix);
     }
 
     @Override
@@ -123,5 +124,19 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
             case "EasyClock" -> new EasyClock(appRegistration, appDrawingComponentHolder);
             default -> new SimpleClock(appRegistration, appDrawingComponentHolder);
         };
+    }
+
+
+    private Flux<String> publishToMatrix(Flux<MatrixFrame> executionFrame) {
+        return executionFrame
+                .flatMapIterable(MatrixFrame::getFrameBuffer)
+                .map(frameBytes -> Mqtt3Publish.builder()
+                        .topic(cfg.getMatrixPublishTopic())
+                        .qos(MqttQos.AT_LEAST_ONCE)
+                        .payload(ByteBuffer.wrap(frameBytes))
+                        .build())
+                .publish(client::publish)
+                .doOnNext(pub -> log.debug("Publish result: {}", pub.getPublish()))
+                .transformDeferred(PublishToMatrixHandler::convertPublishResultsToReadableString);
     }
 }
