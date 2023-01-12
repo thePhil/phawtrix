@@ -63,7 +63,6 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
                 .switchIfEmpty(
                         Mono.error(new IllegalStateException(String.format("App %s should have been returned", appName))))
                 .doOnSuccess(appRegistration -> log.debug("Found AppRegistration {} for initialize", appRegistration.getAppName()))
-                .log()
                 .checkpoint()
                 .flatMap(reg -> appRepositoryService.loadPhawtrixApp(reg.getAppName())
                         .doOnSuccess(a -> {
@@ -77,7 +76,6 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
                                 .checkpoint()
                                 .doOnSuccess(num -> log.debug("saved successfully with total {} elements", appRepositoryService.numberOfStoredApps())))
                 )
-                .log()
                 .doOnSuccess(data -> log.debug("We have {} apps in the repository", appRepositoryService.numberOfStoredApps()))
                 .then();
     }
@@ -87,34 +85,31 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
         Assert.hasText(appName, "A valid app name must be given");
         Flux<MatrixFrame> appFlux = appRegistrationRepository
                 .findByName(appName)
-                .flatMapMany(reg -> Mono.just(reg.getAppName())
-                        .flatMap(appRepositoryService::loadPhawtrixApp)
-                        .switchIfEmpty(
-                                Mono.error(new IllegalStateException(String.format("App %s should have been returned", appName))))
-                        .checkpoint()
-                        .doOnSuccess(app -> log.debug("App {} has been loaded, start execution.", app.getAppRegistration().getAppName()))
-                        .flatMapMany(PhawtrixApp::execute)
-                        .doOnNext(frame -> log.debug("Frame number: {}", frame.getFrameNumber()))
-                        .limitRate(1)
-                        .delayElements(Duration.ofMillis(reg.getMilliInterval()))
-                        .doOnSubscribe(sub -> {
-                            AtomicInteger numSubs = subsPerApp.computeIfAbsent(appName, k -> new AtomicInteger(0));
-                            numSubs.getAndIncrement();
-                            if (numSubs.getAcquire() > 1) {
-                                log.warn("To many subscribers, cancelling subscription");
-                                sub.cancel();
-                            } else {
-                                this.subscription = sub;
-                            }
-                        })
-                        .doOnCancel(() -> subsPerApp
-                                .compute(appName,
-                                        (s, atomicInteger) -> new AtomicInteger(0)
-                                )
-                        )
-                );
+                .flatMapMany(reg -> handleExecute(reg, appName));
 
-        return appFlux.transform(this::publishToMatrix);
+        return appFlux.transform(this::publishToMatrix)
+                .doOnSubscribe(sub -> {
+                    AtomicInteger numSubs = subsPerApp.computeIfAbsent(appName, k -> new AtomicInteger(0));
+                    if (numSubs.incrementAndGet() <= 1) {
+                        this.subscription = sub;
+                    } else {
+                        log.warn("To many subscribers, cancelling subscription");
+                        sub.cancel();
+                    }
+                });
+
+    }
+
+    private Flux<MatrixFrame> handleExecute(AppRegistration reg, String appName) {
+        return appRepositoryService.loadPhawtrixApp(reg.getAppName())
+                .switchIfEmpty(
+                        Mono.error(new IllegalStateException(String.format("App %s should have been returned", appName))))
+                .checkpoint()
+                .doOnSuccess(app -> log.debug("App {} has been loaded, start execution.", app.getAppRegistration().getAppName()))
+                .flatMapMany(PhawtrixApp::execute)
+                .doOnNext(frame -> log.debug("Frame number: {}", frame.getFrameNumber()))
+                .limitRate(1)
+                .delayElements(Duration.ofMillis(reg.getMilliInterval()));
     }
 
     @Override
@@ -122,7 +117,10 @@ public class PhawtrixAppManagerImpl implements PhawtrixAppManager {
         Assert.hasText(appName, "A valid app name must be given");
         return appRepositoryService.loadPhawtrixApp(appName)
                 .flatMap(PhawtrixApp::stop)
-                .doOnSuccess(unused -> subscription.cancel());
+                .doOnSuccess(unused -> {
+                    subscription.cancel();
+                    subsPerApp.compute(appName, (s, ai) -> new AtomicInteger(0));
+                });
     }
 
     protected PhawtrixApp produceApp(AppRegistration appRegistration) {

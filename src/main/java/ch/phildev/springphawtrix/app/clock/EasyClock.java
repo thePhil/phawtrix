@@ -74,6 +74,7 @@ public class EasyClock implements PhawtrixApp {
 
     @Override
     public Mono<Void> stop() {
+        log.warn("Easy Clock is being stopped!");
         return Mono.empty();
     }
 

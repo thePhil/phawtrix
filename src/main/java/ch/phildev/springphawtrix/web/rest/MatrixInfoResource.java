@@ -1,7 +1,12 @@
 package ch.phildev.springphawtrix.web.rest;
 
-import java.time.Duration;
-
+import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
+import ch.phildev.springphawtrix.communicator.MatrixStreamHolder;
+import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
+import ch.phildev.springphawtrix.domain.PhawtrixCommand;
+import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
+import ch.phildev.springphawtrix.service.CommandEncoder;
+import ch.phildev.springphawtrix.web.rest.dto.MatrixInfoDto;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
@@ -17,13 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import ch.phildev.springphawtrix.communicator.ConnectToMatrixHandler;
-import ch.phildev.springphawtrix.communicator.MatrixStreamHolder;
-import ch.phildev.springphawtrix.communicator.PublishToMatrixHandler;
-import ch.phildev.springphawtrix.domain.PhawtrixCommand;
-import ch.phildev.springphawtrix.domain.PhawtrixMqttConfig;
-import ch.phildev.springphawtrix.service.CommandEncoder;
-import ch.phildev.springphawtrix.web.rest.dto.MatrixInfoDto;
+import java.time.Duration;
 
 @RestController
 @RequestMapping(value = "/matrix-info",
@@ -73,7 +72,9 @@ public class MatrixInfoResource {
         Flux<byte[]> payload = Flux.just(commandEncoder.getPayloadForMatrix(PhawtrixCommand.GET_MATRIX_INFO));
 
         Flux<Mqtt3Publish> infoStreamFromMatrix = Flux.defer(() ->
-                streamHolder.getStreamHolder().orElse(Flux.error(new RuntimeException("No subscription"))));
+                streamHolder.getStreamHolder()
+                        .orElse(Flux.error(new RuntimeException("No subscription")))
+        );
 
         // getPayload
         return connectHandler.connectScenario()
@@ -87,7 +88,7 @@ public class MatrixInfoResource {
                 .last()
                 .map(s -> new Gson().fromJson(s.toLowerCase(), MatrixInfoDto.class))
                 .onErrorMap(JsonSyntaxException.class, e -> new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error " +
-                                                                                                                "during JSON processing", e))
+                        "during JSON processing", e))
                 .timeout(Duration.ofSeconds(cfg.getTimeoutMs()));
     }
 }

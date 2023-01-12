@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -21,21 +20,7 @@ public class AppResource {
     private final PhawtrixAppManager appManager;
     private final ConnectToMatrixHandler connectToMatrixHandler;
 
-    @GetMapping(value = "/command/{appName}/execute", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<String> executeApp(@PathVariable String appName) {
-        Assert.hasText(appName, "AppName must be given");
-        log.debug("reached the controller");
-
-        return connectToMatrixHandler.connectScenario()
-                .checkpoint()
-                .then(appManager.initApp(appName))
-                .checkpoint()
-                .thenMany(appManager.executeApp(appName))
-                .map(t -> t.toString())
-                .doOnNext(log::debug);
-    }
-
-    @GetMapping(value = "/command/{appName}/executeAndForget",
+    @GetMapping(value = "/command/{appName}/execute",
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> executeAppAsync(@PathVariable String appName) {
@@ -48,8 +33,7 @@ public class AppResource {
                 .then(appManager.initApp(appName))
                 .doOnSuccess(data -> log.debug("App is initialized"))
                 .checkpoint()
-                .doOnSuccess(data -> appManager.executeApp(appName)
-                        .subscribe())
+                .doOnSuccess(data -> appManager.executeApp(appName).subscribe())
                 .map(sub -> "Successfully fired");
     }
 
@@ -58,7 +42,8 @@ public class AppResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<Void> stopApp(@PathVariable String appName) {
         Assert.hasText(appName, "AppName must be given");
-        log.debug("reached the controller");
+        log.debug("Reached the stopping controller");
+
         return appManager.stopApp(appName);
     }
 }
